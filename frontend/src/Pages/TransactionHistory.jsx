@@ -5,7 +5,7 @@ import PostNavbar from "./PostNavBar.jsx";
 import UkRegisteredCompany from "../components/UkRegisteredCompany.jsx";
 import Footer from "../components/Footer.jsx";
 import WelcomeAction from "./WelcomeAction.jsx";
-import { transactionAPI, isAuthenticated, getErrorMessage } from "../api";
+import { transactionAPI, isAuthenticated, getErrorMessage } from "../api.js";
 
 const TransactionHistory = () => {
   const navigate = useNavigate();
@@ -13,8 +13,16 @@ const TransactionHistory = () => {
   const [filtered, setFiltered] = useState([]);
   const [transactionType, setTransactionType] = useState("All transactions");
   const [currency, setCurrency] = useState("All eCurrencies");
-  const [fromDate, setFromDate] = useState({ month: "Jan", day: "01", year: "2025" });
-  const [toDate, setToDate] = useState({ month: "Dec", day: "31", year: "2025" });
+  const [fromDate, setFromDate] = useState({
+    month: "Jan",
+    day: "01",
+    year: "2025",
+  });
+  const [toDate, setToDate] = useState({
+    month: "Dec",
+    day: "31",
+    year: "2025",
+  });
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState("");
 
@@ -36,7 +44,7 @@ const TransactionHistory = () => {
 
       if (response.data.success) {
         const transData = response.data.transactions || [];
-        
+
         console.log("Transactions fetched:", transData.length);
 
         // Transform backend data to match component format
@@ -96,7 +104,9 @@ const TransactionHistory = () => {
 
     // Filter by date range
     try {
-      const from = new Date(`${fromDate.month} ${fromDate.day}, ${fromDate.year}`);
+      const from = new Date(
+        `${fromDate.month} ${fromDate.day}, ${fromDate.year}`
+      );
       const to = new Date(`${toDate.month} ${toDate.day}, ${toDate.year}`);
 
       result = result.filter((t) => {
@@ -115,8 +125,23 @@ const TransactionHistory = () => {
     0
   );
 
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, '0'));
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const days = Array.from({ length: 31 }, (_, i) =>
+    (i + 1).toString().padStart(2, "0")
+  );
   const years = ["2024", "2025", "2026", "2027"];
 
   return (
@@ -174,39 +199,44 @@ const TransactionHistory = () => {
               </div>
 
               <div className="flex flex-col md:flex-row gap-3">
-                {[{ date: fromDate, setter: setFromDate }, { date: toDate, setter: setToDate }].map(
-                  ({ date, setter }, idx) => (
-                    <div key={idx} className="flex gap-2 w-full md:w-1/2">
-                      <select
-                        value={date.month}
-                        onChange={(e) => setter({ ...date, month: e.target.value })}
-                        className="bg-[#0d0d0d] border border-[#333] rounded-full text-sm px-3 py-2 w-1/3"
-                      >
-                        {months.map((m) => (
-                          <option key={m}>{m}</option>
-                        ))}
-                      </select>
-                      <select
-                        value={date.day}
-                        onChange={(e) => setter({ ...date, day: e.target.value })}
-                        className="bg-[#0d0d0d] border border-[#333] rounded-full text-sm px-3 py-2 w-1/3"
-                      >
-                        {days.map((d) => (
-                          <option key={d}>{d}</option>
-                        ))}
-                      </select>
-                      <select
-                        value={date.year}
-                        onChange={(e) => setter({ ...date, year: e.target.value })}
-                        className="bg-[#0d0d0d] border border-[#333] rounded-full text-sm px-3 py-2 w-1/3"
-                      >
-                        {years.map((y) => (
-                          <option key={y}>{y}</option>
-                        ))}
-                      </select>
-                    </div>
-                  )
-                )}
+                {[
+                  { date: fromDate, setter: setFromDate },
+                  { date: toDate, setter: setToDate },
+                ].map(({ date, setter }, idx) => (
+                  <div key={idx} className="flex gap-2 w-full md:w-1/2">
+                    <select
+                      value={date.month}
+                      onChange={(e) =>
+                        setter({ ...date, month: e.target.value })
+                      }
+                      className="bg-[#0d0d0d] border border-[#333] rounded-full text-sm px-3 py-2 w-1/3"
+                    >
+                      {months.map((m) => (
+                        <option key={m}>{m}</option>
+                      ))}
+                    </select>
+                    <select
+                      value={date.day}
+                      onChange={(e) => setter({ ...date, day: e.target.value })}
+                      className="bg-[#0d0d0d] border border-[#333] rounded-full text-sm px-3 py-2 w-1/3"
+                    >
+                      {days.map((d) => (
+                        <option key={d}>{d}</option>
+                      ))}
+                    </select>
+                    <select
+                      value={date.year}
+                      onChange={(e) =>
+                        setter({ ...date, year: e.target.value })
+                      }
+                      className="bg-[#0d0d0d] border border-[#333] rounded-full text-sm px-3 py-2 w-1/3"
+                    >
+                      {years.map((y) => (
+                        <option key={y}>{y}</option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
               </div>
 
               <button

@@ -3,7 +3,12 @@ import { useNavigate } from "react-router-dom";
 import PostNavBar from "./PostNavBar.jsx";
 import Footer from "../components/Footer.jsx";
 import WelcomeAction from "./WelcomeAction.jsx";
-import { userAPI, withdrawalAPI, isAuthenticated, getErrorMessage } from "../api";
+import {
+  userAPI,
+  withdrawalAPI,
+  isAuthenticated,
+  getErrorMessage,
+} from "../api.js";
 
 const AskForWithdrawal = () => {
   const navigate = useNavigate();
@@ -99,7 +104,11 @@ const AskForWithdrawal = () => {
     const withdrawAmount = parseFloat(amount);
 
     if (withdrawAmount < selectedAccount.minWithdraw) {
-      setError(`Minimum withdrawal amount is ${selectedAccount.minWithdraw} ${selectedAccount.name.toUpperCase()}`);
+      setError(
+        `Minimum withdrawal amount is ${
+          selectedAccount.minWithdraw
+        } ${selectedAccount.name.toUpperCase()}`
+      );
       return;
     }
 
@@ -124,9 +133,9 @@ const AskForWithdrawal = () => {
       if (response.data.success) {
         setSuccess(
           `Withdrawal request submitted successfully!\n\n` +
-          `Amount: ${withdrawAmount} ${selectedAccount.name.toUpperCase()}\n` +
-          `Transaction ID: ${response.data.withdrawal.transactionId}\n\n` +
-          `Please check your email to confirm this withdrawal (2-click security).`
+            `Amount: ${withdrawAmount} ${selectedAccount.name.toUpperCase()}\n` +
+            `Transaction ID: ${response.data.withdrawal.transactionId}\n\n` +
+            `Please check your email to confirm this withdrawal (2-click security).`
         );
 
         // Clear form
@@ -138,10 +147,10 @@ const AskForWithdrawal = () => {
         setTimeout(() => {
           alert(
             `✅ Withdrawal Request Submitted!\n\n` +
-            `A confirmation email has been sent to your registered email address.\n` +
-            `Please click the confirmation link to proceed with your withdrawal.\n\n` +
-            `Amount: ${withdrawAmount} ${selectedAccount.name.toUpperCase()}\n` +
-            `Status: Pending Confirmation`
+              `A confirmation email has been sent to your registered email address.\n` +
+              `Please click the confirmation link to proceed with your withdrawal.\n\n` +
+              `Amount: ${withdrawAmount} ${selectedAccount.name.toUpperCase()}\n` +
+              `Status: Pending Confirmation`
           );
           navigate("/PostDashboard");
         }, 2000);
@@ -200,7 +209,8 @@ const AskForWithdrawal = () => {
                       <div>
                         <p className="font-semibold">{account.label}</p>
                         <p className="text-sm text-gray-400">
-                          Min: {account.minWithdraw} {account.name.toUpperCase()}
+                          Min: {account.minWithdraw}{" "}
+                          {account.name.toUpperCase()}
                         </p>
                       </div>
                       <div className="text-right">
@@ -218,8 +228,8 @@ const AskForWithdrawal = () => {
             {/* Wallet Address */}
             <div className="mb-6">
               <label className="block text-sm mb-2 text-gray-300 font-semibold">
-                {selectedAccount 
-                  ? `${selectedAccount.label} Wallet Address *` 
+                {selectedAccount
+                  ? `${selectedAccount.label} Wallet Address *`
                   : "Wallet Address *"}
               </label>
               <input
@@ -232,7 +242,8 @@ const AskForWithdrawal = () => {
                     ? "bc1q... or 1... or 3..."
                     : selectedAccount?.name === "ethereum"
                     ? "0x..."
-                    : selectedAccount?.name === "tron" || selectedAccount?.name === "usdt"
+                    : selectedAccount?.name === "tron" ||
+                      selectedAccount?.name === "usdt"
                     ? "T..."
                     : "Enter your wallet address"
                 }
@@ -259,7 +270,9 @@ const AskForWithdrawal = () => {
                 />
                 {selectedAccount && (
                   <button
-                    onClick={() => setAmount(selectedAccount.balance.toString())}
+                    onClick={() =>
+                      setAmount(selectedAccount.balance.toString())
+                    }
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-500 hover:bg-yellow-600 text-black px-3 py-1 rounded text-sm font-semibold"
                     disabled={isSubmitting}
                   >
@@ -269,7 +282,8 @@ const AskForWithdrawal = () => {
               </div>
               {selectedAccount && (
                 <p className="text-xs text-gray-400 mt-1">
-                  Available: {selectedAccount.balance.toFixed(4)} {selectedAccount.name.toUpperCase()}
+                  Available: {selectedAccount.balance.toFixed(4)}{" "}
+                  {selectedAccount.name.toUpperCase()}
                 </p>
               )}
             </div>
@@ -300,9 +314,24 @@ const AskForWithdrawal = () => {
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center">
-                  <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin h-5 w-5 mr-2"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Submitting...
                 </span>
@@ -313,11 +342,15 @@ const AskForWithdrawal = () => {
 
             {/* Important Notice */}
             <div className="mt-6 bg-yellow-900/20 border border-yellow-600 rounded p-4">
-              <h4 className="text-yellow-400 font-semibold mb-2">⚠️ Important Notice</h4>
+              <h4 className="text-yellow-400 font-semibold mb-2">
+                ⚠️ Important Notice
+              </h4>
               <ul className="text-xs text-gray-300 space-y-1 list-disc list-inside">
                 <li>Double-check your wallet address before submitting</li>
                 <li>Wrong addresses cannot be recovered</li>
-                <li>You will receive a confirmation email (2-click security)</li>
+                <li>
+                  You will receive a confirmation email (2-click security)
+                </li>
                 <li>Withdrawals are processed after admin approval</li>
                 <li>Processing time: 24-48 hours after confirmation</li>
               </ul>

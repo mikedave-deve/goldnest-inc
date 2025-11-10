@@ -14,7 +14,7 @@ import ActiveDeposit from "./Pages/ActiveDeposit.jsx";
 import TransactionHistory from "./Pages/TransactionHistory.jsx";
 import Referral from "./Pages/Referral.jsx";
 import ProfileSettings from "./Pages/ProfileSettings.jsx";
-import DepositConfirmation from "./Pages/DepositConfirmation.jsx";
+import DepositConfirmation from "./Pages/DepositConfirmation.jsx.jsx";
 import ResetPasswordConfirm from "./Pages/ResetPasswordConfirm.jsx";
 
 //Admin Dashboard Pages
@@ -25,7 +25,6 @@ import WithdrawalsManagement from "./Pages/admin/WithdrawalsManagement.jsx";
 import TransactionsManagement from "./Pages/admin/TransactionsManagement.jsx";
 import ReferralsManagement from "./Pages/admin/ReferralsManagement.jsx";
 import AdminSettings from "./Pages/admin/AdminSettings.jsx";
-
 
 // Route Protection Components
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
@@ -40,37 +39,144 @@ function App() {
         <Route path="/Login" element={<Login />} />
         <Route path="/Register" element={<Register />} />
         <Route path="/ForgetPassword" element={<ForgetPassword />} />
-        <Route path="/ResetPasswordConfirm" element={<ResetPasswordConfirm />} />
+        <Route
+          path="/ResetPasswordConfirm"
+          element={<ResetPasswordConfirm />}
+        />
         <Route path="/About" element={<About />} />
         <Route path="/Investment" element={<Investment />} />
         <Route path="/Partners" element={<Partners />} />
         <Route path="/ContactUs" element={<ContactUs />} />
 
-
-         {/* ================================================
+        {/* ================================================
             USER DASHBOARD ROUTES - Requires authentication
             ================================================ */}
-        <Route path="/PostDashboard" element={<ProtectedRoute><PostDashboard /></ProtectedRoute>} />
-        <Route path="/AddDeposit" element={<ProtectedRoute><AddDeposit /></ProtectedRoute>} />
-        <Route path="/AskForWithdrawal" element={<ProtectedRoute><AskForWithdrawal /></ProtectedRoute>} />
-        <Route path="/ActiveDeposit" element={<ProtectedRoute><ActiveDeposit /></ProtectedRoute>} />
-        <Route path="/TransactionHistory" element={<ProtectedRoute><TransactionHistory /></ProtectedRoute>} />
-        <Route path="/Referral" element={<ProtectedRoute><Referral /></ProtectedRoute>} />
-        <Route path="/ProfileSettings" element={<ProtectedRoute><ProfileSettings /></ProtectedRoute>} />
-        <Route path="/DepositConfirmation" element={<ProtectedRoute><DepositConfirmation /></ProtectedRoute>} />
+        <Route
+          path="/PostDashboard"
+          element={
+            <ProtectedRoute>
+              <PostDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/AddDeposit"
+          element={
+            <ProtectedRoute>
+              <AddDeposit />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/AskForWithdrawal"
+          element={
+            <ProtectedRoute>
+              <AskForWithdrawal />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ActiveDeposit"
+          element={
+            <ProtectedRoute>
+              <ActiveDeposit />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/TransactionHistory"
+          element={
+            <ProtectedRoute>
+              <TransactionHistory />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Referral"
+          element={
+            <ProtectedRoute>
+              <Referral />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ProfileSettings"
+          element={
+            <ProtectedRoute>
+              <ProfileSettings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/DepositConfirmation"
+          element={
+            <ProtectedRoute>
+              <DepositConfirmation />
+            </ProtectedRoute>
+          }
+        />
 
-       {/* ================================================
+        {/* ================================================
             ADMIN DASHBOARD ROUTES - Requires admin role
             ================================================ */}
-        <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-        <Route path="/admin/users" element={<AdminRoute><UsersManagement /></AdminRoute>} />
-        <Route path="/admin/deposits" element={<AdminRoute><DepositsManagement /></AdminRoute>} />
-        <Route path="/admin/withdrawals" element={<AdminRoute><WithdrawalsManagement /></AdminRoute>} />
-        <Route path="/admin/transactions" element={<AdminRoute><TransactionsManagement /></AdminRoute>} />
-        <Route path="/admin/referrals" element={<AdminRoute><ReferralsManagement /></AdminRoute>} />
-        <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
-        
-         {/* ================================================
+        <Route
+          path="/admin/dashboard"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <AdminRoute>
+              <UsersManagement />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/deposits"
+          element={
+            <AdminRoute>
+              <DepositsManagement />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/withdrawals"
+          element={
+            <AdminRoute>
+              <WithdrawalsManagement />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/transactions"
+          element={
+            <AdminRoute>
+              <TransactionsManagement />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/referrals"
+          element={
+            <AdminRoute>
+              <ReferralsManagement />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/settings"
+          element={
+            <AdminRoute>
+              <AdminSettings />
+            </AdminRoute>
+          }
+        />
+
+        {/* ================================================
             404 ROUTE - Catch all unmatched routes
             ================================================ */}
         <Route
@@ -90,7 +196,6 @@ function App() {
             </div>
           }
         />
-
       </Routes>
     </Router>
   );

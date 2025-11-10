@@ -5,7 +5,7 @@ import WelcomeAction from "./WelcomeAction.jsx";
 import UkRegisteredCompany from "../components/UkRegisteredCompany.jsx";
 import Footer from "../components/Footer.jsx";
 import DepoImg from "../assets/depo.png";
-import { depositAPI, isAuthenticated, getErrorMessage } from "../api";
+import { depositAPI, isAuthenticated, getErrorMessage } from "../api.js";
 
 const ActiveDeposit = () => {
   const navigate = useNavigate();
@@ -57,13 +57,13 @@ const ActiveDeposit = () => {
   const fetchActiveDeposits = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch user's deposits from backend: GET /api/deposits/user-deposits
       const response = await depositAPI.getUserDeposits();
 
       if (response.data.success) {
         const userDeposits = response.data.deposits || [];
-        
+
         // Get username if available
         if (response.data.username) {
           setUsername(response.data.username);
@@ -71,11 +71,17 @@ const ActiveDeposit = () => {
 
         // Filter only active/approved deposits
         const activeOnly = userDeposits.filter(
-          (dep) => dep.status === "approved" || dep.status === "active" || dep.status === "processing"
+          (dep) =>
+            dep.status === "approved" ||
+            dep.status === "active" ||
+            dep.status === "processing"
         );
 
         // Calculate total active deposit amount
-        const total = activeOnly.reduce((sum, dep) => sum + (dep.amount || 0), 0);
+        const total = activeOnly.reduce(
+          (sum, dep) => sum + (dep.amount || 0),
+          0
+        );
         setTotalActive(total);
 
         // Group deposits by plan

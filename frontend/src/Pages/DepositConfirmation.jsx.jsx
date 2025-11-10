@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import PostNavBar from "./PostNavBar.jsx";
 import Footer from "../components/Footer.jsx";
-import { depositAPI, getErrorMessage } from "../api";
+import { depositAPI, getErrorMessage } from "../api.js";
 
 const DepositConfirmation = () => {
   const { state } = useLocation();
@@ -40,7 +40,8 @@ const DepositConfirmation = () => {
     paypal: "payments@goldnest-investment.com",
   };
 
-  const walletAddress = walletAddresses[currency] || "Contact support for wallet address";
+  const walletAddress =
+    walletAddresses[currency] || "Contact support for wallet address";
 
   const handleConfirmDeposit = async () => {
     // Validation
@@ -70,10 +71,10 @@ const DepositConfirmation = () => {
         // Show success message
         alert(
           `✅ Deposit request submitted successfully!\n\n` +
-          `Transaction ID: ${response.data.deposit.transactionId}\n` +
-          `Amount: $${amount}\n` +
-          `Plan: ${plan.name}\n\n` +
-          `Your deposit is pending admin approval. You will receive an email once approved.`
+            `Transaction ID: ${response.data.deposit.transactionId}\n` +
+            `Amount: $${amount}\n` +
+            `Plan: ${plan.name}\n\n` +
+            `Your deposit is pending admin approval. You will receive an email once approved.`
         );
 
         // Redirect to dashboard
@@ -83,7 +84,7 @@ const DepositConfirmation = () => {
       console.error("Deposit Error:", err);
       const errorMsg = getErrorMessage(err);
       setError(errorMsg);
-      
+
       // Show error in alert as well
       alert(`⚠️ Error: ${errorMsg}`);
     } finally {
@@ -92,7 +93,7 @@ const DepositConfirmation = () => {
   };
 
   // Calculate expected profit
-  const expectedProfit = (amount * plan.profitPercentage / 100).toFixed(2);
+  const expectedProfit = ((amount * plan.profitPercentage) / 100).toFixed(2);
   const totalReturn = (Number(amount) + Number(expectedProfit)).toFixed(2);
 
   return (
@@ -133,7 +134,9 @@ const DepositConfirmation = () => {
           {/* Deposit Details */}
           <div className="space-y-3 text-sm md:text-base mb-6">
             <div className="bg-[#0a0a0a] p-4 rounded">
-              <h3 className="text-yellow-400 font-semibold mb-3">Deposit Details</h3>
+              <h3 className="text-yellow-400 font-semibold mb-3">
+                Deposit Details
+              </h3>
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-400">Plan:</span>
@@ -141,15 +144,22 @@ const DepositConfirmation = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Profit Rate:</span>
-                  <span className="font-semibold text-green-400">{plan.profitPercentage}% {plan.duration === 1 ? 'after 24h' : 'daily'}</span>
+                  <span className="font-semibold text-green-400">
+                    {plan.profitPercentage}%{" "}
+                    {plan.duration === 1 ? "after 24h" : "daily"}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Duration:</span>
-                  <span className="font-semibold">{plan.duration} {plan.duration === 1 ? 'day' : 'days'}</span>
+                  <span className="font-semibold">
+                    {plan.duration} {plan.duration === 1 ? "day" : "days"}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Principal Return:</span>
-                  <span className="font-semibold text-green-400">{plan.principalReturn}</span>
+                  <span className="font-semibold text-green-400">
+                    {plan.principalReturn}
+                  </span>
                 </div>
                 <div className="border-t border-gray-700 my-2"></div>
                 <div className="flex justify-between">
@@ -162,12 +172,18 @@ const DepositConfirmation = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Expected Profit:</span>
-                  <span className="font-semibold text-green-400">+${expectedProfit}</span>
+                  <span className="font-semibold text-green-400">
+                    +${expectedProfit}
+                  </span>
                 </div>
                 <div className="border-t border-gray-700 my-2"></div>
                 <div className="flex justify-between text-lg">
-                  <span className="text-yellow-400 font-bold">Total Return:</span>
-                  <span className="font-bold text-yellow-400">${totalReturn}</span>
+                  <span className="text-yellow-400 font-bold">
+                    Total Return:
+                  </span>
+                  <span className="font-bold text-yellow-400">
+                    ${totalReturn}
+                  </span>
                 </div>
               </div>
             </div>
@@ -179,7 +195,8 @@ const DepositConfirmation = () => {
               Enter Transaction ID *
             </label>
             <p className="text-xs text-gray-500 mb-2">
-              After sending the payment, enter your transaction ID/hash from your wallet
+              After sending the payment, enter your transaction ID/hash from
+              your wallet
             </p>
             <input
               type="text"
@@ -211,9 +228,24 @@ const DepositConfirmation = () => {
             >
               {isSaving ? (
                 <span className="flex items-center justify-center">
-                  <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin h-5 w-5 mr-2"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Submitting...
                 </span>
@@ -232,7 +264,9 @@ const DepositConfirmation = () => {
 
           {/* Important Notice */}
           <div className="mt-6 bg-yellow-900/20 border border-yellow-600 rounded p-4">
-            <h4 className="text-yellow-400 font-semibold mb-2">⚠️ Important Notice</h4>
+            <h4 className="text-yellow-400 font-semibold mb-2">
+              ⚠️ Important Notice
+            </h4>
             <ul className="text-xs text-gray-300 space-y-1 list-disc list-inside">
               <li>Send payment to the exact address shown above</li>
               <li>Enter the correct transaction ID after payment</li>

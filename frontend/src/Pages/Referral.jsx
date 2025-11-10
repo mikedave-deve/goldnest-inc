@@ -4,9 +4,9 @@ import PostNavbar from "./PostNavBar.jsx";
 import WelcomeAction from "./WelcomeAction.jsx";
 import ThreePercentImg from "../assets/threepercent.png";
 import OnePercentImg from "../assets/onepercent.png";
-import UKRegisteredCompanySection from "../components/UkRegisteredCompany";
-import Footer from "../components/Footer";
-import { userAPI, isAuthenticated, getErrorMessage } from "../api";
+import UKRegisteredCompanySection from "../components/UkRegisteredCompany.jsx";
+import Footer from "../components/Footer.jsx";
+import { userAPI, isAuthenticated, getErrorMessage } from "../api.js";
 
 const Referral = () => {
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ const Referral = () => {
 
       if (response.data.success) {
         const data = response.data.referralData || response.data;
-        
+
         // Build referral URL if not provided
         let referralUrl = data.referralUrl;
         if (!referralUrl && data.referralCode) {
@@ -49,31 +49,36 @@ const Referral = () => {
           username: data.username || "User",
           referralCode: data.referralCode || data.username,
           referralUrl: referralUrl || `${window.location.origin}/register`,
-          
+
           // Handle referredBy - might be ObjectId, username, or null
-          referredBy: data.referredBy 
-            ? (typeof data.referredBy === 'string' ? data.referredBy : data.referredBy.username || "Unknown")
+          referredBy: data.referredBy
+            ? typeof data.referredBy === "string"
+              ? data.referredBy
+              : data.referredBy.username || "Unknown"
             : null,
-          
+
           // Referral counts - check multiple possible field names
-          referralsCount: data.referralsCount || 
-                         data.totalReferrals || 
-                         (data.referrals ? data.referrals.length : 0) || 
-                         0,
-          
+          referralsCount:
+            data.referralsCount ||
+            data.totalReferrals ||
+            (data.referrals ? data.referrals.length : 0) ||
+            0,
+
           activeReferrals: data.activeReferrals || 0,
-          
+
           // Commission - check multiple possible field names
           totalCommission: data.totalCommission || data.referralEarnings || 0,
-          
+
           // Referrals list
-          referrals: data.referrals || []
+          referrals: data.referrals || [],
         };
 
         setReferralData(formattedData);
         console.log("Referral data fetched and formatted:", formattedData);
       } else {
-        throw new Error(response.data.message || "Failed to fetch referral data");
+        throw new Error(
+          response.data.message || "Failed to fetch referral data"
+        );
       }
     } catch (err) {
       console.error("Error fetching referral data:", err);
@@ -148,7 +153,8 @@ const Referral = () => {
         <section className="text-center py-16 px-4">
           <h1 className="text-4xl md:text-5xl font-semibold mb-4">Partners</h1>
           <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
-            We offer the ideas that raise your investment above the expected income.
+            We offer the ideas that raise your investment above the expected
+            income.
           </p>
         </section>
 
@@ -181,7 +187,7 @@ const Referral = () => {
             <h3 className="text-xl font-semibold text-yellow-400 mb-4">
               Your Referral Info
             </h3>
-            
+
             <div className="space-y-4">
               {/* Your referral url */}
               <div>
@@ -239,7 +245,9 @@ const Referral = () => {
                 YOUR REFERRALS
               </h2>
               <p className="text-xl md:text-2xl font-semibold text-black">
-                YOU HAVE EARNED ${(referralData?.totalCommission || 0).toFixed(2)} FROM REFERRALS SO FAR!
+                YOU HAVE EARNED $
+                {(referralData?.totalCommission || 0).toFixed(2)} FROM REFERRALS
+                SO FAR!
               </p>
             </div>
 
@@ -284,17 +292,17 @@ const Referral = () => {
             <div className="flex-1 text-gray-300 space-y-4 leading-relaxed">
               <p>
                 At Goldnest, we believe that the most effective way to grow our
-                business is through the recommendations of our satisfied clients.
-                With this in mind, Goldnest has introduced a highly rewarding
-                two-tier affiliate program that offers attractive incentives for
-                those who share our services with others.
+                business is through the recommendations of our satisfied
+                clients. With this in mind, Goldnest has introduced a highly
+                rewarding two-tier affiliate program that offers attractive
+                incentives for those who share our services with others.
               </p>
 
               <p>
-                Goldnest rewards individuals for helping to promote its investment
-                program and anyone can participate. To earn rewards, simply invite
-                your friends, family, and colleagues to join through your unique
-                referral link.
+                Goldnest rewards individuals for helping to promote its
+                investment program and anyone can participate. To earn rewards,
+                simply invite your friends, family, and colleagues to join
+                through your unique referral link.
               </p>
 
               <p>
@@ -305,11 +313,11 @@ const Referral = () => {
 
               <p>
                 You will earn{" "}
-                <span className="text-[#f5c84c] font-semibold">7%</span> from the
-                investments made by your direct referrals and{" "}
-                <span className="text-[#f5c84c] font-semibold">3%</span> from the
-                investments of your second-level referrals. You can withdraw your
-                earnings at any time.
+                <span className="text-[#f5c84c] font-semibold">7%</span> from
+                the investments made by your direct referrals and{" "}
+                <span className="text-[#f5c84c] font-semibold">3%</span> from
+                the investments of your second-level referrals. You can withdraw
+                your earnings at any time.
               </p>
             </div>
 
@@ -373,7 +381,9 @@ const Referral = () => {
                       </td>
                       <td className="py-3 text-gray-400">
                         {ref.registrationDate || ref.joinDate
-                          ? new Date(ref.registrationDate || ref.joinDate).toLocaleDateString()
+                          ? new Date(
+                              ref.registrationDate || ref.joinDate
+                            ).toLocaleDateString()
                           : "N/A"}
                       </td>
                       <td className="py-3">

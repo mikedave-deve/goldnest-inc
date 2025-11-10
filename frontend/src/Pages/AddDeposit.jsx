@@ -4,7 +4,7 @@ import PostNavBar from "./PostNavBar.jsx";
 import UkRegisteredCompany from "../components/UkRegisteredCompany.jsx";
 import Footer from "../components/Footer.jsx";
 import WelcomeAction from "./WelcomeAction.jsx";
-import { userAPI, isAuthenticated, getErrorMessage } from "../api";
+import { userAPI, isAuthenticated, getErrorMessage } from "../api.js";
 
 const AddDeposit = () => {
   const [processor, setProcessor] = useState("bitcoin");
@@ -27,16 +27,16 @@ const AddDeposit = () => {
   const fetchUser = async () => {
     try {
       setLoading(true);
-      
+
       // Try multiple endpoints to get user data
       let response;
       let userData;
-      
+
       try {
         // First try /api/user/profile
         response = await userAPI.getProfile();
         console.log("Profile response:", response.data);
-        
+
         // Handle different response formats
         if (response.data.success && response.data.profile) {
           userData = response.data.profile;
@@ -50,12 +50,12 @@ const AddDeposit = () => {
         }
       } catch (profileErr) {
         console.log("Profile endpoint failed, trying balances:", profileErr);
-        
+
         // Fallback to /api/user/balances
         try {
           response = await userAPI.getBalances();
           console.log("Balances response:", response.data);
-          
+
           if (response.data.success && response.data.balances) {
             userData = response.data.balances;
           } else if (response.data.success) {
@@ -64,12 +64,15 @@ const AddDeposit = () => {
             userData = response.data;
           }
         } catch (balanceErr) {
-          console.log("Balances endpoint failed, trying dashboard:", balanceErr);
-          
+          console.log(
+            "Balances endpoint failed, trying dashboard:",
+            balanceErr
+          );
+
           // Last fallback to /api/user/dashboard
           response = await userAPI.getDashboard();
           console.log("Dashboard response:", response.data);
-          
+
           if (response.data.success && response.data.dashboard) {
             userData = response.data.dashboard;
           } else if (response.data.success) {
@@ -84,23 +87,22 @@ const AddDeposit = () => {
 
       if (userData) {
         setUserData(userData);
-        
+
         // Try to get account balance from different possible fields
-        const accountBalance = 
-          userData.accountBalance || 
-          userData.balance || 
-          userData.totalBalance || 
+        const accountBalance =
+          userData.accountBalance ||
+          userData.balance ||
+          userData.totalBalance ||
           0;
-          
+
         setBalance(accountBalance);
       } else {
         throw new Error("No user data received from backend");
       }
-      
     } catch (err) {
       console.error("Error fetching user:", err);
       console.error("Error details:", err.response);
-      
+
       const errorMsg = getErrorMessage(err);
       setError(errorMsg);
 
@@ -187,9 +189,9 @@ const AddDeposit = () => {
       alert("Please select an investment plan.");
       return;
     }
-    
+
     const depositAmount = Number(amount);
-    
+
     if (depositAmount < selectedPlan.min || depositAmount > selectedPlan.max) {
       alert(
         `Amount must be between $${selectedPlan.min} and $${selectedPlan.max} for this plan.`
@@ -227,7 +229,9 @@ const AddDeposit = () => {
         <PostNavBar />
         <div className="flex items-center justify-center min-h-[60vh] px-4">
           <div className="bg-red-900/30 border border-red-500 rounded-lg p-6 max-w-md text-center">
-            <p className="text-red-400 mb-2 font-semibold">Error loading user data</p>
+            <p className="text-red-400 mb-2 font-semibold">
+              Error loading user data
+            </p>
             <p className="text-gray-400 text-sm mb-4">{error}</p>
             <div className="flex gap-3 justify-center">
               <button
@@ -255,7 +259,7 @@ const AddDeposit = () => {
       <PostNavBar />
       <main className="px-4 md:px-10 lg:px-20 py-10">
         <WelcomeAction username={userData?.username || "User"} />
-        
+
         {error && (
           <div className="mb-4 bg-yellow-900/30 border border-yellow-500 rounded-lg p-4 max-w-4xl mx-auto">
             <p className="text-yellow-400 text-sm">
@@ -263,7 +267,7 @@ const AddDeposit = () => {
             </p>
           </div>
         )}
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-10">
           {/* Deposit Form */}
           <div className="bg-black rounded-lg p-6 border border-[#222] w-full">
@@ -356,10 +360,14 @@ const AddDeposit = () => {
                     <p className="text-5xl font-bold mb-2 text-white">
                       {plan.profit}
                     </p>
-                    <p className="text-white font-semibold mb-3">Daily Profit</p>
+                    <p className="text-white font-semibold mb-3">
+                      Daily Profit
+                    </p>
                     <p className="text-[#fdc700] mb-1">Min: ${plan.min}</p>
                     <p className="text-[#fdc700] mb-2">Max: ${plan.max}</p>
-                    <p className="text-[#fdc700] text-sm mb-2">{plan.description}</p>
+                    <p className="text-[#fdc700] text-sm mb-2">
+                      {plan.description}
+                    </p>
                     {selectedPlan?.name === plan.name && (
                       <div className="mt-2 bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold">
                         SELECTED

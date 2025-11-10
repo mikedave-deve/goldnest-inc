@@ -5,7 +5,7 @@ import PostNavBar from "./PostNavBar.jsx";
 import UkRegisteredCompany from "../components/UkRegisteredCompany.jsx";
 import Footer from "../components/Footer.jsx";
 import { Eye, EyeOff } from "lucide-react";
-import { userAPI, authAPI, isAuthenticated, getErrorMessage } from "../api";
+import { userAPI, authAPI, isAuthenticated, getErrorMessage } from "../api.js";
 
 const ProfileSettings = () => {
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ const ProfileSettings = () => {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  
+
   // Password visibility states
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -49,10 +49,10 @@ const ProfileSettings = () => {
 
       if (response.data.success) {
         const userData = response.data.profile || response.data.user;
-        
+
         console.log("User data fetched:", userData);
         setUser(userData);
-        
+
         // Set form data with user info
         setFormData({
           fullName: userData.username || "",
@@ -75,7 +75,7 @@ const ProfileSettings = () => {
     } catch (err) {
       console.error("Error fetching user:", err);
       const errorMsg = getErrorMessage(err);
-      
+
       if (err.response?.status === 401 || err.response?.status === 403) {
         localStorage.removeItem("token");
         localStorage.removeItem("userInfo");
@@ -104,7 +104,11 @@ const ProfileSettings = () => {
   const handleSaveChanges = async () => {
     try {
       // Validate password fields
-      if (formData.newPassword || formData.retypePassword || formData.currentPassword) {
+      if (
+        formData.newPassword ||
+        formData.retypePassword ||
+        formData.currentPassword
+      ) {
         // If any password field is filled, all must be filled
         if (!formData.currentPassword) {
           alert("Please enter your current password");
@@ -140,7 +144,9 @@ const ProfileSettings = () => {
         }
       } else {
         // No password fields filled
-        alert("Please fill in password fields if you want to change your password");
+        alert(
+          "Please fill in password fields if you want to change your password"
+        );
         return;
       }
 
@@ -156,8 +162,10 @@ const ProfileSettings = () => {
       const response = await authAPI.changePassword(passwordData);
 
       if (response.data.success) {
-        alert("Password updated successfully! Please login again with your new password.");
-        
+        alert(
+          "Password updated successfully! Please login again with your new password."
+        );
+
         // Clear password fields
         setFormData((prev) => ({
           ...prev,
@@ -175,7 +183,7 @@ const ProfileSettings = () => {
     } catch (error) {
       console.error("Password update error:", error);
       const errorMsg = getErrorMessage(error);
-      
+
       if (error.response?.status === 401) {
         alert("Current password is incorrect");
       } else {
@@ -302,7 +310,9 @@ const ProfileSettings = () => {
                 <div className="space-y-4">
                   {/* Current Password with visibility toggle */}
                   <div className="flex items-center gap-3">
-                    <label className="w-40 text-gray-300">Current Password:</label>
+                    <label className="w-40 text-gray-300">
+                      Current Password:
+                    </label>
                     <div className="flex-1 relative">
                       <input
                         type={showCurrentPassword ? "text" : "password"}
@@ -314,7 +324,9 @@ const ProfileSettings = () => {
                       />
                       <button
                         type="button"
-                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        onClick={() =>
+                          setShowCurrentPassword(!showCurrentPassword)
+                        }
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 focus:outline-none"
                         tabIndex={-1}
                       >
@@ -356,7 +368,9 @@ const ProfileSettings = () => {
 
                   {/* Retype Password with visibility toggle */}
                   <div className="flex items-center gap-3">
-                    <label className="w-40 text-gray-300">Retype Password:</label>
+                    <label className="w-40 text-gray-300">
+                      Retype Password:
+                    </label>
                     <div className="flex-1 relative">
                       <input
                         type={showRetypePassword ? "text" : "password"}
@@ -368,7 +382,9 @@ const ProfileSettings = () => {
                       />
                       <button
                         type="button"
-                        onClick={() => setShowRetypePassword(!showRetypePassword)}
+                        onClick={() =>
+                          setShowRetypePassword(!showRetypePassword)
+                        }
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 focus:outline-none"
                         tabIndex={-1}
                       >
@@ -429,7 +445,9 @@ const ProfileSettings = () => {
                   <div className="w-8 h-8 bg-[#26a17b] rounded flex items-center justify-center">
                     <span className="text-white font-bold text-xs">₮</span>
                   </div>
-                  <label className="text-gray-300 font-semibold">USDT (TRC20)</label>
+                  <label className="text-gray-300 font-semibold">
+                    USDT (TRC20)
+                  </label>
                 </div>
                 <input
                   type="text"
@@ -448,7 +466,9 @@ const ProfileSettings = () => {
                   <div className="w-8 h-8 bg-[#627eea] rounded flex items-center justify-center">
                     <span className="text-white font-bold text-xs">Ξ</span>
                   </div>
-                  <label className="text-gray-300 font-semibold">Ethereum</label>
+                  <label className="text-gray-300 font-semibold">
+                    Ethereum
+                  </label>
                 </div>
                 <input
                   type="text"

@@ -7,7 +7,7 @@ import WalletIcon from "../assets/wallet.png";
 import DepositIcon from "../assets/deposit.png";
 import UKRegisteredCompanySection from "../components/UkRegisteredCompany.jsx";
 import Footer from "../components/Footer.jsx";
-import { userAPI, isAuthenticated, getErrorMessage } from "../api";
+import { userAPI, isAuthenticated, getErrorMessage } from "../api.js";
 
 const PostDashboard = () => {
   const navigate = useNavigate();
@@ -30,14 +30,14 @@ const PostDashboard = () => {
       const res = await userAPI.getDashboard();
 
       if (res.data.success) {
-        console.log('📊 Dashboard data received:', res.data.dashboard);
-        console.log('📝 Referral code:', res.data.dashboard.referralCode);
+        console.log("📊 Dashboard data received:", res.data.dashboard);
+        console.log("📝 Referral code:", res.data.dashboard.referralCode);
         setUserData(res.data.dashboard);
       }
     } catch (err) {
       console.error("Dashboard Fetch Error:", err);
       const errorMsg = getErrorMessage(err);
-      
+
       if (err.response?.status === 401 || err.response?.status === 403) {
         localStorage.removeItem("token");
         localStorage.removeItem("userInfo");
@@ -57,10 +57,10 @@ const PostDashboard = () => {
       setTimeout(() => setMessage(""), 3000);
       return;
     }
-    
+
     // ✅ FIXED: Use the actual referral code from backend
     const referralUrl = `http://goldnest-inc.biz/register?ref=${userData.referralCode}`;
-    
+
     navigator.clipboard
       .writeText(referralUrl)
       .then(() => {
@@ -119,10 +119,10 @@ const PostDashboard = () => {
   return (
     <div className="min-h-screen bg-[#111] text-white font-sans">
       <PostNavBar username={userData.username} />
-      
+
       <main className="px-6 py-10">
         <WelcomeAction username={userData.username} />
-        
+
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {[
@@ -202,19 +202,17 @@ const PostDashboard = () => {
               <h4 className="text-lg font-semibold mb-3 text-yellow-400">
                 Your Referral Program
               </h4>
-              
-             
-              
 
               {/* Referral URL */}
               <div>
-                <p className="text-gray-400 text-xs mb-2">Share Your Referral Link:</p>
+                <p className="text-gray-400 text-xs mb-2">
+                  Share Your Referral Link:
+                </p>
                 <div className="flex flex-col md:flex-row items-center justify-between bg-black px-3 py-2 rounded-md gap-2">
                   <p className="text-yellow-400 text-xs truncate flex-1">
-                    {userData.referralCode 
+                    {userData.referralCode
                       ? `goldnest-inc.com/register?ref=${userData.referralCode}`
-                      : "No referral code available"
-                    }
+                      : "No referral code available"}
                   </p>
                   <button
                     onClick={handleCopyReferralLink}

@@ -30,7 +30,7 @@ app.use(mongoSanitize());
 
 // Enable CORS with dynamic origin
 app.use(cors({
-  origin: (process.env.CORS_ORIGIN || 'http://localhost:5173').split(','),
+  origin: (process.env.CORS_ORIGIN || 'http://localhost:5173, https://goldnest-q3937n1df-mike-deves-projects.vercel.app').split(','),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
