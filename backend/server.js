@@ -28,14 +28,16 @@ app.use(helmet());
 // Data sanitization against NoSQL injection
 app.use(mongoSanitize());
 
-// Enable CORS with dynamic origin
 app.use(cors({
-  origin: (process.env.CORS_ORIGIN || 'http://localhost:5173, https://goldnest-inc.vercel.app').split(','),
+  origin: (process.env.CORS_ORIGIN || 'http://localhost:5173,https://goldnest-inc.vercel.app')
+    .split(',')
+    .map(origin => origin.trim()), // remove any accidental spaces
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   optionsSuccessStatus: 200
 }));
+
 
 // Rate limiting - Global API limiter
 const limiter = rateLimit({
