@@ -1,3 +1,4 @@
+// src/pages/AddDeposit.jsx - MOBILE OPTIMIZED
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PostNavBar from "./PostNavBar.jsx";
@@ -27,23 +28,18 @@ const AddDeposit = () => {
   const fetchUser = async () => {
     try {
       setLoading(true);
-
-      // Try multiple endpoints to get user data
       let response;
       let userData;
 
       try {
-        // First try /api/user/profile
         response = await userAPI.getProfile();
         console.log("Profile response:", response.data);
 
-        // Handle different response formats
         if (response.data.success && response.data.profile) {
           userData = response.data.profile;
         } else if (response.data.user) {
           userData = response.data.user;
         } else if (response.data.success) {
-          // Data might be directly in response.data
           userData = response.data;
         } else {
           userData = response.data;
@@ -51,7 +47,6 @@ const AddDeposit = () => {
       } catch (profileErr) {
         console.log("Profile endpoint failed, trying balances:", profileErr);
 
-        // Fallback to /api/user/balances
         try {
           response = await userAPI.getBalances();
           console.log("Balances response:", response.data);
@@ -64,12 +59,8 @@ const AddDeposit = () => {
             userData = response.data;
           }
         } catch (balanceErr) {
-          console.log(
-            "Balances endpoint failed, trying dashboard:",
-            balanceErr
-          );
+          console.log("Balances endpoint failed, trying dashboard:", balanceErr);
 
-          // Last fallback to /api/user/dashboard
           response = await userAPI.getDashboard();
           console.log("Dashboard response:", response.data);
 
@@ -88,7 +79,6 @@ const AddDeposit = () => {
       if (userData) {
         setUserData(userData);
 
-        // Try to get account balance from different possible fields
         const accountBalance =
           userData.accountBalance ||
           userData.balance ||
@@ -106,7 +96,6 @@ const AddDeposit = () => {
       const errorMsg = getErrorMessage(err);
       setError(errorMsg);
 
-      // Only redirect to login on auth errors
       if (err.response?.status === 401 || err.response?.status === 403) {
         localStorage.removeItem("token");
         localStorage.removeItem("userInfo");
@@ -199,7 +188,6 @@ const AddDeposit = () => {
       return;
     }
 
-    // Navigate to confirmation page with deposit data
     navigate("/DepositConfirmation", {
       state: {
         plan: selectedPlan,
@@ -210,7 +198,6 @@ const AddDeposit = () => {
     });
   };
 
-  // Show loading state
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#111]">
@@ -222,7 +209,6 @@ const AddDeposit = () => {
     );
   }
 
-  // Show error state but allow continuing
   if (error && !userData) {
     return (
       <div className="min-h-screen bg-[#111]">
@@ -257,7 +243,7 @@ const AddDeposit = () => {
   return (
     <div className="min-h-screen bg-[#111] text-white font-sans">
       <PostNavBar />
-      <main className="px-4 md:px-10 lg:px-20 py-10">
+      <main className="px-4 sm:px-6 lg:px-20 py-6 sm:py-8 lg:py-10 pb-20">
         <WelcomeAction username={userData?.username || "User"} />
 
         {error && (
@@ -268,21 +254,22 @@ const AddDeposit = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-10">
-          {/* Deposit Form */}
-          <div className="bg-black rounded-lg p-6 border border-[#222] w-full">
-            <h2 className="text-xl font-semibold mb-6 text-yellow-400">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6 sm:gap-8 lg:gap-10">
+          {/* Deposit Form - Mobile Optimized */}
+          <div className="bg-black rounded-xl p-4 sm:p-6 border border-[#222] w-full shadow-lg order-2 lg:order-1">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-yellow-400 flex items-center gap-2">
+              <span className="text-2xl">💳</span>
               Make an <span className="text-white">Investment</span>
             </h2>
 
-            <div className="mb-5">
-              <label className="block text-sm mb-2 text-gray-300">
+            <div className="mb-4 sm:mb-5">
+              <label className="block text-xs sm:text-sm mb-2 text-gray-300 font-medium">
                 Payment Currency
               </label>
               <select
                 value={processor}
                 onChange={(e) => setProcessor(e.target.value)}
-                className="w-full bg-transparent border border-yellow-500 rounded-full px-4 py-3 text-white outline-none cursor-pointer"
+                className="w-full bg-black border border-yellow-500 rounded-lg px-4 py-3 text-white outline-none cursor-pointer focus:ring-2 focus:ring-yellow-500 text-sm sm:text-base"
               >
                 {paymentOptions.map((option, i) => (
                   <option key={i} value={option.value} className="bg-black">
@@ -292,20 +279,20 @@ const AddDeposit = () => {
               </select>
             </div>
 
-            <div className="mb-5">
-              <label className="block text-sm mb-2 text-gray-300">
+            <div className="mb-4 sm:mb-5">
+              <label className="block text-xs sm:text-sm mb-2 text-gray-300 font-medium">
                 Deposit amount ($)
               </label>
               <input
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full bg-transparent border border-yellow-500 rounded-full px-4 py-3 text-white outline-none"
+                className="w-full bg-black border border-yellow-500 rounded-lg px-4 py-3 text-white outline-none focus:ring-2 focus:ring-yellow-500 text-sm sm:text-base"
                 placeholder="Enter deposit amount"
                 min="50"
               />
               {selectedPlan && (
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-gray-400 mt-2">
                   Min: ${selectedPlan.min} | Max: ${selectedPlan.max}
                 </p>
               )}
@@ -314,9 +301,9 @@ const AddDeposit = () => {
             <button
               onClick={handleMakeDeposit}
               disabled={!selectedPlan}
-              className={`font-semibold px-6 py-3 rounded transition cursor-pointer w-full ${
+              className={`font-bold px-6 py-3 rounded-lg transition cursor-pointer w-full text-sm sm:text-base ${
                 selectedPlan
-                  ? "bg-yellow-500 hover:bg-yellow-600 text-black"
+                  ? "bg-yellow-500 hover:bg-yellow-600 text-black shadow-lg"
                   : "bg-gray-600 text-gray-400 cursor-not-allowed"
               }`}
             >
@@ -324,24 +311,25 @@ const AddDeposit = () => {
             </button>
 
             {/* Balance Display */}
-            <div className="mt-8 bg-black border border-[#222] rounded-lg p-4">
-              <h3 className="text-yellow-400 mb-2">Available Balance</h3>
-              <p className="text-3xl font-bold">${balance.toFixed(2)}</p>
-              <p className="text-sm text-gray-400">Account balance</p>
+            <div className="mt-6 sm:mt-8 bg-gradient-to-br from-black to-[#0a0a0a] border border-yellow-600/30 rounded-xl p-4 shadow-lg">
+              <h3 className="text-yellow-400 mb-2 text-sm sm:text-base font-semibold">Available Balance</h3>
+              <p className="text-2xl sm:text-3xl font-bold">${balance.toFixed(2)}</p>
+              <p className="text-xs sm:text-sm text-gray-400">Account balance</p>
             </div>
           </div>
 
-          {/* Investment Plans */}
-          <div className="bg-black rounded-lg p-6 border border-[#222]">
-            <h2 className="text-xl font-semibold mb-6 text-yellow-400">
+          {/* Investment Plans - Mobile Optimized */}
+          <div className="bg-black rounded-xl p-4 sm:p-6 border border-[#222] shadow-lg order-1 lg:order-2">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-yellow-400 flex items-center gap-2">
+              <span className="text-2xl">📊</span>
               Investment Plans
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
               {investmentPlans.map((plan, i) => (
                 <div
                   key={i}
                   onClick={() => setSelectedPlan(plan)}
-                  className={`bg-[#0b0b0b] border rounded-md overflow-hidden flex flex-col items-center text-center cursor-pointer transition transform hover:scale-105 ${
+                  className={`bg-[#0b0b0b] border rounded-lg overflow-hidden flex flex-col items-center text-center cursor-pointer transition transform hover:scale-105 ${
                     selectedPlan?.name === plan.name
                       ? "border-yellow-500 shadow-lg shadow-yellow-500/50"
                       : "border-[#222] hover:border-yellow-600"
@@ -354,23 +342,23 @@ const AddDeposit = () => {
                         : "bg-[#0b0b0b] text-white"
                     }`}
                   >
-                    <h3 className="text-sm font-semibold">{plan.name}</h3>
+                    <h3 className="text-xs sm:text-sm font-bold px-2">{plan.name}</h3>
                   </div>
-                  <div className="flex-1 flex flex-col justify-center items-center py-6 px-4">
-                    <p className="text-5xl font-bold mb-2 text-white">
+                  <div className="flex-1 flex flex-col justify-center items-center py-4 sm:py-6 px-3 sm:px-4">
+                    <p className="text-4xl sm:text-5xl font-bold mb-2 text-white">
                       {plan.profit}
                     </p>
-                    <p className="text-white font-semibold mb-3">
+                    <p className="text-white font-semibold mb-3 text-sm sm:text-base">
                       Daily Profit
                     </p>
-                    <p className="text-[#fdc700] mb-1">Min: ${plan.min}</p>
-                    <p className="text-[#fdc700] mb-2">Max: ${plan.max}</p>
-                    <p className="text-[#fdc700] text-sm mb-2">
+                    <p className="text-[#fdc700] mb-1 text-xs sm:text-sm">Min: ${plan.min}</p>
+                    <p className="text-[#fdc700] mb-2 text-xs sm:text-sm">Max: ${plan.max}</p>
+                    <p className="text-[#fdc700] text-xs mb-2">
                       {plan.description}
                     </p>
                     {selectedPlan?.name === plan.name && (
                       <div className="mt-2 bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold">
-                        SELECTED
+                        ✓ SELECTED
                       </div>
                     )}
                   </div>

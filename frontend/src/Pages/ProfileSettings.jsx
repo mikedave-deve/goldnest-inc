@@ -1,4 +1,4 @@
-// src/pages/ProfileSettings.jsx
+// src/pages/ProfileSettings.jsx - MOBILE OPTIMIZED
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PostNavBar from "./PostNavBar.jsx";
@@ -43,8 +43,6 @@ const ProfileSettings = () => {
   const fetchUser = async () => {
     try {
       setLoading(true);
-
-      // Fetch user profile from backend: GET /api/user/profile
       const response = await userAPI.getProfile();
 
       if (response.data.success) {
@@ -53,7 +51,6 @@ const ProfileSettings = () => {
         console.log("User data fetched:", userData);
         setUser(userData);
 
-        // Set form data with user info
         setFormData({
           fullName: userData.username || "",
           email: userData.email || "",
@@ -62,7 +59,6 @@ const ProfileSettings = () => {
           retypePassword: "",
         });
 
-        // Set wallet addresses if they exist
         if (userData.walletAddresses) {
           setWalletAddresses({
             bitcoin: userData.walletAddresses.bitcoin || "",
@@ -88,28 +84,23 @@ const ProfileSettings = () => {
     }
   };
 
-  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle wallet address changes
   const handleWalletChange = (e) => {
     const { name, value } = e.target;
     setWalletAddresses((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle password update
   const handleSaveChanges = async () => {
     try {
-      // Validate password fields
       if (
         formData.newPassword ||
         formData.retypePassword ||
         formData.currentPassword
       ) {
-        // If any password field is filled, all must be filled
         if (!formData.currentPassword) {
           alert("Please enter your current password");
           return;
@@ -125,25 +116,21 @@ const ProfileSettings = () => {
           return;
         }
 
-        // Check if passwords match
         if (formData.newPassword !== formData.retypePassword) {
           alert("New passwords do not match!");
           return;
         }
 
-        // Check password length
         if (formData.newPassword.length < 6) {
           alert("New password must be at least 6 characters long");
           return;
         }
 
-        // Check if new password is different from current
         if (formData.currentPassword === formData.newPassword) {
           alert("New password must be different from current password");
           return;
         }
       } else {
-        // No password fields filled
         alert(
           "Please fill in password fields if you want to change your password"
         );
@@ -152,7 +139,6 @@ const ProfileSettings = () => {
 
       setSaving(true);
 
-      // Call backend to change password: PUT /api/auth/change-password
       const passwordData = {
         currentPassword: formData.currentPassword,
         newPassword: formData.newPassword,
@@ -166,19 +152,12 @@ const ProfileSettings = () => {
           "Password updated successfully! Please login again with your new password."
         );
 
-        // Clear password fields
         setFormData((prev) => ({
           ...prev,
           currentPassword: "",
           newPassword: "",
           retypePassword: "",
         }));
-
-        // Optional: Logout user and redirect to login
-        // Uncomment if you want to force re-login after password change
-        // localStorage.removeItem("token");
-        // localStorage.removeItem("userInfo");
-        // navigate("/login");
       }
     } catch (error) {
       console.error("Password update error:", error);
@@ -221,212 +200,218 @@ const ProfileSettings = () => {
     );
   }
 
+  // Format registration date
+  const registrationDate = user.createdAt
+    ? new Date(user.createdAt).toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      })
+    : "N/A";
+
   return (
-    <div className="min-h-screen bg-[#111] text-gray-200 font-sans">
-      <PostNavBar />
+    <div className="min-h-screen bg-[#111] text-white">
+      <PostNavBar username={user.username} />
 
-      <main className="px-4 md:px-10 lg:px-20 py-10">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* --- LEFT CARD --- */}
-          <aside className="bg-[#0b0b0b] border border-[#222] rounded-lg overflow-hidden shadow-md text-center">
-            <div className="bg-[#f5c84c] py-6">
-              <h2 className="text-2xl font-semibold text-gray-900">
-                {user.username}
-              </h2>
-            </div>
-
-            <div className="p-6">
-              <div className="flex justify-center mb-6">
-                <div className="w-32 h-32 rounded-full border-4 border-[#f5c84c] flex items-center justify-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-20 h-20 text-gray-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a8.25 8.25 0 0115 0"
-                    />
-                  </svg>
+      {/* Mobile-Optimized Main Content */}
+      <main className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 lg:py-10 pb-20">
+        {/* Profile Header Card - Mobile Optimized */}
+        <div className="bg-gradient-to-br from-[#0b0b0b] to-black border border-yellow-600 rounded-xl shadow-2xl p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+            {/* Avatar */}
+            <div className="relative">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 border-yellow-500 bg-[#1a1a1a] flex items-center justify-center shadow-lg">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full border-2 border-gray-600 bg-gray-800 flex items-center justify-center">
+                  <span className="text-gray-400 text-2xl sm:text-3xl">👤</span>
                 </div>
               </div>
-
-              <p className="text-gray-400 mb-2">
-                Registration:{" "}
-                {user.registrationDate
-                  ? new Date(user.registrationDate).toLocaleString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
-                  : "N/A"}
-              </p>
-              <p className="text-gray-300 mb-6">{user.email}</p>
             </div>
-          </aside>
 
-          {/* --- MIDDLE CARD --- */}
-          <section className="bg-[#0b0b0b] border border-[#222] rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold text-[#f5c84c] mb-6">
+            {/* User Info */}
+            <div className="flex-1 text-center sm:text-left">
+              <h2 className="text-2xl sm:text-3xl font-bold text-yellow-400 mb-2">
+                {user.username || "User"}
+              </h2>
+              <p className="text-sm sm:text-base text-gray-300 mb-1 break-all">
+                {user.email}
+              </p>
+              <p className="text-xs sm:text-sm text-gray-500">
+                Registration: <span className="text-gray-400">{registrationDate}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Forms Grid - Mobile Optimized */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+          {/* Personal Details Card */}
+          <section className="bg-[#0b0b0b] border border-[#222] rounded-xl shadow-lg p-4 sm:p-6">
+            <h3 className="text-lg sm:text-xl font-semibold text-[#f5c84c] mb-4 sm:mb-6 flex items-center gap-2">
+              <span className="text-2xl">📋</span>
               Personal Details
             </h3>
 
-            <div className="space-y-5">
-              <div className="flex items-center gap-3">
-                <label className="w-40 text-gray-300">Full Name:</label>
-                <input
-                  type="text"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  disabled
-                  className="flex-1 bg-transparent border border-gray-600 rounded-full px-4 py-2 text-gray-400 focus:outline-none"
-                  title="Username cannot be changed"
-                />
-              </div>
+            {/* Full Name */}
+            <div className="mb-4 sm:mb-6">
+              <label className="block text-xs sm:text-sm text-gray-400 mb-2 font-medium">
+                Full Name:
+              </label>
+              <input
+                type="text"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleChange}
+                className="w-full bg-black border border-gray-600 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-gray-100 text-sm sm:text-base focus:outline-none focus:border-[#f5c84c] focus:ring-1 focus:ring-[#f5c84c] transition"
+                placeholder="Enter your full name"
+                disabled
+              />
+            </div>
 
-              <div className="flex items-center gap-3">
-                <label className="w-40 text-gray-300">E-mail:</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  disabled
-                  className="flex-1 bg-transparent border border-gray-600 rounded-full px-4 py-2 text-gray-400 focus:outline-none"
-                  title="Email cannot be changed"
-                />
-              </div>
+            {/* Email */}
+            <div className="mb-6 sm:mb-8">
+              <label className="block text-xs sm:text-sm text-gray-400 mb-2 font-medium">
+                E-mail:
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full bg-black border border-gray-600 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-gray-100 text-sm sm:text-base focus:outline-none focus:border-[#f5c84c] focus:ring-1 focus:ring-[#f5c84c] transition"
+                placeholder="Enter your email"
+                disabled
+              />
+            </div>
 
-              <div className="border-t border-gray-700 pt-4 mt-6">
-                <p className="text-sm text-gray-400 mb-4">Change Password</p>
+            {/* Change Password Section */}
+            <div className="border-t border-gray-700 pt-4 sm:pt-6">
+              <p className="text-sm sm:text-base text-[#f5c84c] mb-4 font-semibold flex items-center gap-2">
+                <span className="text-xl">🔒</span>
+                Change Password
+              </p>
 
-                <div className="space-y-4">
-                  {/* Current Password with visibility toggle */}
-                  <div className="flex items-center gap-3">
-                    <label className="w-40 text-gray-300">
-                      Current Password:
-                    </label>
-                    <div className="flex-1 relative">
-                      <input
-                        type={showCurrentPassword ? "text" : "password"}
-                        name="currentPassword"
-                        value={formData.currentPassword}
-                        onChange={handleChange}
-                        className="w-full bg-transparent border border-gray-600 rounded-full px-4 py-2 pr-12 text-gray-100 focus:outline-none focus:border-[#f5c84c]"
-                        placeholder="Enter current password"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setShowCurrentPassword(!showCurrentPassword)
-                        }
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 focus:outline-none"
-                        tabIndex={-1}
-                      >
-                        {showCurrentPassword ? (
-                          <EyeOff className="w-5 h-5" />
-                        ) : (
-                          <Eye className="w-5 h-5" />
-                        )}
-                      </button>
-                    </div>
+              <div className="space-y-3 sm:space-y-4">
+                {/* Current Password */}
+                <div>
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-2">
+                    Current Password:
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showCurrentPassword ? "text" : "password"}
+                      name="currentPassword"
+                      value={formData.currentPassword}
+                      onChange={handleChange}
+                      className="w-full bg-black border border-gray-600 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 pr-10 sm:pr-12 text-gray-100 text-sm sm:text-base focus:outline-none focus:border-[#f5c84c] focus:ring-1 focus:ring-[#f5c84c] transition"
+                      placeholder="Enter current password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 focus:outline-none"
+                      tabIndex={-1}
+                    >
+                      {showCurrentPassword ? (
+                        <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                      ) : (
+                        <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+                      )}
+                    </button>
                   </div>
+                </div>
 
-                  {/* New Password with visibility toggle */}
-                  <div className="flex items-center gap-3">
-                    <label className="w-40 text-gray-300">New Password:</label>
-                    <div className="flex-1 relative">
-                      <input
-                        type={showNewPassword ? "text" : "password"}
-                        name="newPassword"
-                        value={formData.newPassword}
-                        onChange={handleChange}
-                        className="w-full bg-transparent border border-gray-600 rounded-full px-4 py-2 pr-12 text-gray-100 focus:outline-none focus:border-[#f5c84c]"
-                        placeholder="Enter new password"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 focus:outline-none"
-                        tabIndex={-1}
-                      >
-                        {showNewPassword ? (
-                          <EyeOff className="w-5 h-5" />
-                        ) : (
-                          <Eye className="w-5 h-5" />
-                        )}
-                      </button>
-                    </div>
+                {/* New Password */}
+                <div>
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-2">
+                    New Password:
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showNewPassword ? "text" : "password"}
+                      name="newPassword"
+                      value={formData.newPassword}
+                      onChange={handleChange}
+                      className="w-full bg-black border border-gray-600 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 pr-10 sm:pr-12 text-gray-100 text-sm sm:text-base focus:outline-none focus:border-[#f5c84c] focus:ring-1 focus:ring-[#f5c84c] transition"
+                      placeholder="Enter new password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 focus:outline-none"
+                      tabIndex={-1}
+                    >
+                      {showNewPassword ? (
+                        <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                      ) : (
+                        <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+                      )}
+                    </button>
                   </div>
+                </div>
 
-                  {/* Retype Password with visibility toggle */}
-                  <div className="flex items-center gap-3">
-                    <label className="w-40 text-gray-300">
-                      Retype Password:
-                    </label>
-                    <div className="flex-1 relative">
-                      <input
-                        type={showRetypePassword ? "text" : "password"}
-                        name="retypePassword"
-                        value={formData.retypePassword}
-                        onChange={handleChange}
-                        className="w-full bg-transparent border border-gray-600 rounded-full px-4 py-2 pr-12 text-gray-100 focus:outline-none focus:border-[#f5c84c]"
-                        placeholder="Retype new password"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setShowRetypePassword(!showRetypePassword)
-                        }
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 focus:outline-none"
-                        tabIndex={-1}
-                      >
-                        {showRetypePassword ? (
-                          <EyeOff className="w-5 h-5" />
-                        ) : (
-                          <Eye className="w-5 h-5" />
-                        )}
-                      </button>
-                    </div>
+                {/* Retype Password */}
+                <div>
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-2">
+                    Retype Password:
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showRetypePassword ? "text" : "password"}
+                      name="retypePassword"
+                      value={formData.retypePassword}
+                      onChange={handleChange}
+                      className="w-full bg-black border border-gray-600 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 pr-10 sm:pr-12 text-gray-100 text-sm sm:text-base focus:outline-none focus:border-[#f5c84c] focus:ring-1 focus:ring-[#f5c84c] transition"
+                      placeholder="Retype new password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowRetypePassword(!showRetypePassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 focus:outline-none"
+                      tabIndex={-1}
+                    >
+                      {showRetypePassword ? (
+                        <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                      ) : (
+                        <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div className="pt-4 flex justify-end">
-                <button
-                  onClick={handleSaveChanges}
-                  disabled={saving}
-                  className={`bg-[#f5c84c] hover:bg-[#e3b85b] text-black font-semibold px-6 py-2 rounded-md transition ${
-                    saving ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                >
-                  {saving ? "Saving..." : "Save Changes"}
-                </button>
-              </div>
+            {/* Save Button */}
+            <div className="pt-4 sm:pt-6">
+              <button
+                onClick={handleSaveChanges}
+                disabled={saving}
+                className={`w-full bg-[#f5c84c] hover:bg-[#e3b85b] text-black font-bold px-6 py-3 rounded-lg transition shadow-lg hover:shadow-xl ${
+                  saving ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                {saving ? "Saving..." : "Save Changes"}
+              </button>
             </div>
           </section>
 
-          {/* --- RIGHT CARD - Wallet Addresses --- */}
-          <section className="bg-[#0b0b0b] border border-[#222] rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold text-[#f5c84c] mb-6">
+          {/* Wallet Addresses Card */}
+          <section className="bg-[#0b0b0b] border border-[#222] rounded-xl shadow-lg p-4 sm:p-6">
+            <h3 className="text-lg sm:text-xl font-semibold text-[#f5c84c] mb-4 sm:mb-6 flex items-center gap-2">
+              <span className="text-2xl">💳</span>
               Wallet Addresses
             </h3>
 
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* Bitcoin */}
               <div>
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 bg-[#f7931a] rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">₿</span>
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#f7931a] rounded-lg flex items-center justify-center shadow-md">
+                    <span className="text-white font-bold text-sm sm:text-base">₿</span>
                   </div>
-                  <label className="text-gray-300 font-semibold">Bitcoin</label>
+                  <label className="text-gray-300 font-semibold text-sm sm:text-base">Bitcoin</label>
                 </div>
                 <input
                   type="text"
@@ -434,7 +419,7 @@ const ProfileSettings = () => {
                   value={walletAddresses.bitcoin}
                   onChange={handleWalletChange}
                   disabled
-                  className="w-full bg-transparent border border-gray-600 rounded px-4 py-2 text-gray-400 text-sm focus:outline-none"
+                  className="w-full bg-black border border-gray-600 rounded-lg px-3 sm:px-4 py-2.5 text-gray-400 text-xs sm:text-sm focus:outline-none"
                   placeholder="No Bitcoin address set"
                 />
               </div>
@@ -442,10 +427,10 @@ const ProfileSettings = () => {
               {/* USDT */}
               <div>
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 bg-[#26a17b] rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">₮</span>
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#26a17b] rounded-lg flex items-center justify-center shadow-md">
+                    <span className="text-white font-bold text-sm sm:text-base">₮</span>
                   </div>
-                  <label className="text-gray-300 font-semibold">
+                  <label className="text-gray-300 font-semibold text-sm sm:text-base">
                     USDT (TRC20)
                   </label>
                 </div>
@@ -455,7 +440,7 @@ const ProfileSettings = () => {
                   value={walletAddresses.usdt}
                   onChange={handleWalletChange}
                   disabled
-                  className="w-full bg-transparent border border-gray-600 rounded px-4 py-2 text-gray-400 text-sm focus:outline-none"
+                  className="w-full bg-black border border-gray-600 rounded-lg px-3 sm:px-4 py-2.5 text-gray-400 text-xs sm:text-sm focus:outline-none"
                   placeholder="No USDT address set"
                 />
               </div>
@@ -463,10 +448,10 @@ const ProfileSettings = () => {
               {/* Ethereum */}
               <div>
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 bg-[#627eea] rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">Ξ</span>
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#627eea] rounded-lg flex items-center justify-center shadow-md">
+                    <span className="text-white font-bold text-sm sm:text-base">Ξ</span>
                   </div>
-                  <label className="text-gray-300 font-semibold">
+                  <label className="text-gray-300 font-semibold text-sm sm:text-base">
                     Ethereum
                   </label>
                 </div>
@@ -476,7 +461,7 @@ const ProfileSettings = () => {
                   value={walletAddresses.ethereum}
                   onChange={handleWalletChange}
                   disabled
-                  className="w-full bg-transparent border border-gray-600 rounded px-4 py-2 text-gray-400 text-sm focus:outline-none"
+                  className="w-full bg-black border border-gray-600 rounded-lg px-3 sm:px-4 py-2.5 text-gray-400 text-xs sm:text-sm focus:outline-none"
                   placeholder="No Ethereum address set"
                 />
               </div>
@@ -484,10 +469,10 @@ const ProfileSettings = () => {
               {/* Tron */}
               <div>
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 bg-[#eb0029] rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">T</span>
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#eb0029] rounded-lg flex items-center justify-center shadow-md">
+                    <span className="text-white font-bold text-sm sm:text-base">T</span>
                   </div>
-                  <label className="text-gray-300 font-semibold">Tron</label>
+                  <label className="text-gray-300 font-semibold text-sm sm:text-base">Tron</label>
                 </div>
                 <input
                   type="text"
@@ -495,14 +480,17 @@ const ProfileSettings = () => {
                   value={walletAddresses.tron}
                   onChange={handleWalletChange}
                   disabled
-                  className="w-full bg-transparent border border-gray-600 rounded px-4 py-2 text-gray-400 text-sm focus:outline-none"
+                  className="w-full bg-black border border-gray-600 rounded-lg px-3 sm:px-4 py-2.5 text-gray-400 text-xs sm:text-sm focus:outline-none"
                   placeholder="No Tron address set"
                 />
               </div>
 
-              <p className="text-xs text-gray-500 mt-4">
-                * Wallet addresses are set when you make a withdrawal request
-              </p>
+              <div className="bg-yellow-900/20 border border-yellow-600/30 rounded-lg p-3 mt-4">
+                <p className="text-xs text-gray-400 flex items-start gap-2">
+                  <span className="text-yellow-500 text-lg">ℹ️</span>
+                  <span>Wallet addresses are set when you make a withdrawal request</span>
+                </p>
+              </div>
             </div>
           </section>
         </div>
