@@ -1,59 +1,68 @@
 @import "tailwindcss";
 
-/* ========================================
-   MOBILE WHITE SPACE FIX
-   ======================================== */
-
-/* Reset and full height setup */
+/* Reset everything */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Critical: Black background everywhere */
 html {
   height: 100%;
-  height: -webkit-fill-available;
   overflow-x: hidden;
-  -webkit-text-size-adjust: 100%;
+  background-color: #000000;
+  overscroll-behavior: none;
 }
 
 body {
   margin: 0 !important;
   padding: 0 !important;
   width: 100%;
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
+  min-height: 100%;
   overflow-x: hidden;
+  background-color: #000000;
+  overscroll-behavior: none;
   position: relative;
 }
 
 #root {
   width: 100%;
   min-height: 100vh;
-  min-height: -webkit-fill-available;
+  background-color: #111111;
   display: flex;
   flex-direction: column;
 }
 
-/* Fix for iOS Safari address bar */
+/* iOS Safari fix */
 @supports (-webkit-touch-callout: none) {
-  body {
-    min-height: -webkit-fill-available;
+  html {
+    height: -webkit-fill-available;
   }
   
-  #root {
+  body, #root {
     min-height: -webkit-fill-available;
   }
 }
 
-/* Prevent any default spacing */
-body > div {
-  margin: 0;
-  padding: 0;
+/* Safety background - covers any white space */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: -100vh;
+  height: 300vh;
+  background-color: #000000;
+  z-index: -9999;
+  pointer-events: none;
 }
 
-/* Ensure smooth scrolling */
-html {
-  scroll-behavior: smooth;
+/* Prevent bounce scroll showing white */
+@media (max-width: 768px) {
+  html, body {
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+  }
 }
