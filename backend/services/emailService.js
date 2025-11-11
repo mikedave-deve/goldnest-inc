@@ -6,22 +6,21 @@ const nodemailer = require('nodemailer');
 
 // Create transporter for Gmail
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
+  host: 'smtp.hostinger.com',
   port: 465,
-  secure: true, // Use SSL
+  secure: true,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
-  // Production settings
-  pool: true, // Use connection pooling
+  pool: true,
   maxConnections: 5,
   maxMessages: 100,
-  rateDelta: 1000, // Rate limiting
-  rateLimit: 10, // Max 10 emails per second
+  rateDelta: 1000,
+  rateLimit: 10,
 });
 
-// Verify transporter configuration on startup
+// Verify transporter configuration
 transporter.verify((error, success) => {
   if (error) {
     console.error('❌ Gmail SMTP configuration error:', error.message);
@@ -44,7 +43,6 @@ const sendEmail = async (to, subject, html, retries = 3) => {
         to,
         subject,
         html,
-        // Add plain text version for better deliverability
         text: html.replace(/<[^>]*>/g, ''),
       };
 
@@ -59,71 +57,116 @@ const sendEmail = async (to, subject, html, retries = 3) => {
         return null;
       }
       
-      // Wait before retry (exponential backoff)
       await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
     }
   }
 };
 
 // ============================================================
-// EMAIL TEMPLATES
+// MOBILE-FIXED EMAIL TEMPLATE (Black & Gold)
 // ============================================================
 
-// Base email template wrapper for consistent styling
-const emailWrapper = (content, title = 'GoldNest Investment') => `
+const emailTemplate = (content) => `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title}</title>
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <style>
+    /* Force dark mode colors on all email clients */
+    :root {
+      color-scheme: light dark;
+      supported-color-schemes: light dark;
+    }
+    body {
+      margin: 0 !important;
+      padding: 0 !important;
+      background-color: #0a0a0a !important;
+    }
+    /* Prevent auto-formatting on mobile */
+    a { color: #FFD700 !important; }
+    .wrapper { background-color: #0a0a0a !important; }
+    .container { background-color: #000000 !important; }
+  </style>
 </head>
-<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 20px;">
-    <tr>
-      <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #000; border-radius: 10px; overflow: hidden;">
-          ${content}
-        </table>
-      </td>
-    </tr>
-    <tr>
-      <td align="center" style="padding: 20px;">
-        <p style="color: #666; font-size: 12px; margin: 0;">
-          © ${new Date().getFullYear()} GoldNest Investment Platform. All rights reserved.<br>
-          This is an automated email, please do not reply.
-        </p>
-      </td>
-    </tr>
-  </table>
+<body style="margin: 0 !important; padding: 0 !important; font-family: Arial, Helvetica, sans-serif !important; background-color: #0a0a0a !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+  <!-- OUTER WRAPPER - FIXED BLACK BACKGROUND -->
+  <div style="background-color: #0a0a0a !important; min-height: 100vh; padding: 0; margin: 0;">
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color: #0a0a0a !important; padding: 40px 20px; margin: 0;">
+      <tr>
+        <td align="center" style="background-color: #0a0a0a !important; padding: 0;">
+          <!-- INNER CONTAINER - FIXED BLACK WITH GOLD BORDER -->
+          <table width="600" border="0" cellpadding="0" cellspacing="0" role="presentation" style="max-width: 600px; width: 100%; background-color: #000000 !important; border: 2px solid #FFD700; margin: 0 auto;">
+            
+            <!-- HEADER WITH LOGO -->
+            <tr>
+              <td style="background-color: #000000 !important; padding: 30px; text-align: center; border-bottom: 2px solid #FFD700;">
+                <div style="font-size: 36px; font-weight: bold; color: #FFD700 !important; letter-spacing: 2px; margin: 0; padding: 0;">
+                  GOLDNEST
+                </div>
+                <div style="font-size: 12px; color: #999999 !important; margin-top: 5px; letter-spacing: 1px; padding: 0;">
+                  INVESTMENT PLATFORM
+                </div>
+              </td>
+            </tr>
+            
+            <!-- CONTENT -->
+            ${content}
+            
+            <!-- FOOTER -->
+            <tr>
+              <td style="background-color: #0a0a0a !important; padding: 30px; text-align: center; border-top: 1px solid #333333;">
+                <p style="color: #666666 !important; font-size: 12px; margin: 0 0 10px 0; padding: 0;">
+                  © ${new Date().getFullYear()} GoldNest Investment Platform. All rights reserved.
+                </p>
+                <p style="color: #666666 !important; font-size: 11px; margin: 0; padding: 0;">
+                  This is an automated email. Please do not reply to this message.
+                </p>
+              </td>
+            </tr>
+            
+          </table>
+        </td>
+      </tr>
+    </table>
+  </div>
 </body>
 </html>
 `;
 
-// Header template
-const emailHeader = (title, icon = '🌟') => `
+// Content Section - FIXED
+const contentSection = (html) => `
 <tr>
-  <td style="background: linear-gradient(135deg, #FFD700, #FFA500); padding: 40px 30px; text-align: center;">
-    <h1 style="margin: 0; color: #000; font-size: 32px;">${icon} ${title}</h1>
-  </td>
-</tr>
-`;
-
-// Content section template
-const emailContent = (html) => `
-<tr>
-  <td style="background-color: #1a1a1a; padding: 40px 30px; color: #fff;">
+  <td style="background-color: #000000 !important; padding: 40px 30px; color: #ffffff !important;">
     ${html}
   </td>
 </tr>
 `;
 
-// Button template
-const emailButton = (url, text) => `
-<table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+// Info Box - FIXED
+const infoBox = (items) => `
+<table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color: #0a0a0a !important; border: 1px solid #333333; margin: 25px 0;">
+  <tr>
+    <td style="padding: 20px; background-color: #0a0a0a !important;">
+      ${items.map((item, index) => `
+        <div style="margin-bottom: ${index === items.length - 1 ? '0' : '12px'}; padding-bottom: ${index === items.length - 1 ? '0' : '12px'}; border-bottom: ${index === items.length - 1 ? 'none' : '1px solid #222222'};">
+          <div style="color: #999999 !important; font-size: 12px; margin-bottom: 4px;">${item.label}</div>
+          <div style="color: #ffffff !important; font-size: 15px; font-weight: 500;">${item.value}</div>
+        </div>
+      `).join('')}
+    </td>
+  </tr>
+</table>
+`;
+
+// Button - FIXED
+const button = (url, text) => `
+<table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin: 30px 0;">
   <tr>
     <td align="center">
-      <a href="${url}" style="background-color: #FFD700; color: #000; padding: 15px 40px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; font-size: 16px;">
+      <a href="${url}" style="display: inline-block; background-color: #FFD700 !important; color: #000000 !important; padding: 14px 40px; text-decoration: none; font-weight: bold; font-size: 14px; letter-spacing: 1px; border-radius: 2px; border: none;">
         ${text}
       </a>
     </td>
@@ -131,464 +174,361 @@ const emailButton = (url, text) => `
 </table>
 `;
 
-// Info box template
-const infoBox = (title, items) => `
-<table width="100%" cellpadding="0" cellspacing="0" style="background-color: #2a2a2a; border-radius: 5px; margin: 20px 0;">
-  <tr>
-    <td style="padding: 20px;">
-      <h3 style="color: #FFD700; margin: 0 0 15px 0;">${title}</h3>
-      ${items.map(item => `
-        <p style="color: #ddd; margin: 8px 0; line-height: 1.6;">
-          <strong>${item.label}:</strong> ${item.value}
-        </p>
-      `).join('')}
-    </td>
-  </tr>
-</table>
+// Alert Box - FIXED
+const alertBox = (text, type = 'info') => {
+  const colors = {
+    info: '#FFD700',
+    success: '#00FF00',
+    warning: '#FFA500',
+    danger: '#FF4444'
+  };
+  return `
+<div style="background-color: #0a0a0a !important; border-left: 4px solid ${colors[type]}; padding: 15px 20px; margin: 25px 0;">
+  <p style="color: #ffffff !important; margin: 0; line-height: 1.6; font-size: 14px;">
+    ${text}
+  </p>
+</div>
 `;
+};
 
 // ============================================================
-// 1. REGISTRATION PENDING EMAIL
+// EMAIL FUNCTIONS (UNCHANGED - ONLY TEMPLATE FIXED)
 // ============================================================
 
 const sendRegistrationPending = async (email, username) => {
-  const content = emailHeader('Welcome to GoldNest', '🎉') + emailContent(`
-    <h2 style="color: #FFD700; margin: 0 0 20px 0;">Hello ${username}!</h2>
-    <p style="color: #ddd; line-height: 1.8; font-size: 16px;">
-      Thank you for registering with <strong style="color: #FFD700;">GoldNest Investment Platform</strong>.
+  const content = contentSection(`
+    <h2 style="color: #FFD700 !important; margin: 0 0 20px 0; font-size: 24px; font-weight: normal;">
+      Welcome, ${username}
+    </h2>
+    <p style="color: #cccccc !important; line-height: 1.8; font-size: 15px; margin-bottom: 20px;">
+      Thank you for registering with <strong style="color: #FFD700 !important;">GoldNest Investment Platform</strong>.
     </p>
-    <p style="color: #ddd; line-height: 1.8; font-size: 16px;">
-      Your account is currently <strong style="color: #FFA500;">pending admin approval</strong>.
+    <p style="color: #cccccc !important; line-height: 1.8; font-size: 15px;">
+      Your account is currently <strong style="color: #FFA500 !important;">pending admin approval</strong>.
     </p>
     
-    ${infoBox('What Happens Next?', [
-      { label: '⏳ Step 1', value: 'Admin reviews your registration (24-48 hours)' },
-      { label: '✉️ Step 2', value: 'You receive approval confirmation email' },
-      { label: '🚀 Step 3', value: 'Login and start investing immediately' }
+    ${infoBox([
+      { label: 'STEP 1', value: 'Admin reviews your registration (24-48 hours)' },
+      { label: 'STEP 2', value: 'You receive approval confirmation email' },
+      { label: 'STEP 3', value: 'Login and start investing' }
     ])}
     
-    <div style="background-color: #FFD700; color: #000; padding: 20px; border-radius: 5px; margin: 30px 0; text-align: center;">
-      <p style="margin: 0; font-weight: bold; font-size: 16px;">
-        💰 Minimum Deposit: $50 | 📈 Up to 20% Returns
-      </p>
-    </div>
+    ${alertBox('You will receive an email notification once your account is approved.', 'info')}
     
-    <p style="color: #999; font-size: 14px; margin-top: 40px; padding-top: 20px; border-top: 1px solid #333;">
-      Need assistance? Contact us at <a href="mailto:${process.env.ADMIN_EMAIL}" style="color: #FFD700;">${process.env.ADMIN_EMAIL}</a>
+    <p style="color: #999999 !important; font-size: 13px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #222222;">
+      Need assistance? Contact us at <a href="mailto:${process.env.ADMIN_EMAIL}" style="color: #FFD700 !important; text-decoration: none;">${process.env.ADMIN_EMAIL}</a>
     </p>
   `);
   
-  return await sendEmail(email, 'Registration Pending - GoldNest Investment', emailWrapper(content));
+  return await sendEmail(email, 'Registration Pending - GoldNest Investment', emailTemplate(content));
 };
-
-// ============================================================
-// 2. REGISTRATION APPROVED EMAIL
-// ============================================================
 
 const sendRegistrationApproved = async (email, username) => {
-  const content = emailHeader('Account Approved!', '✅') + emailContent(`
-    <h2 style="color: #FFD700; margin: 0 0 20px 0;">Congratulations ${username}!</h2>
-    <p style="color: #ddd; line-height: 1.8; font-size: 16px;">
-      Your GoldNest Investment account has been <strong style="color: #00FF00;">approved</strong>!
+  const content = contentSection(`
+    <h2 style="color: #FFD700 !important; margin: 0 0 20px 0; font-size: 24px; font-weight: normal;">
+      Account Approved
+    </h2>
+    <p style="color: #cccccc !important; line-height: 1.8; font-size: 15px;">
+      Congratulations <strong style="color: #ffffff !important;">${username}</strong>! Your GoldNest Investment account has been approved.
     </p>
-    <p style="color: #ddd; line-height: 1.8; font-size: 16px;">
-      You can now login and start building your investment portfolio with confidence.
+    <p style="color: #cccccc !important; line-height: 1.8; font-size: 15px;">
+      You can now login and start building your investment portfolio.
     </p>
     
-    ${emailButton('http://goldnest-inc.biz/login', 'Login to Dashboard')}
+    ${button('http://goldnest-inc.com/login', 'LOGIN TO DASHBOARD')}
     
-    ${infoBox('Available Investment Plans', [
-      { label: '🥉 Basic Plan', value: '1.5% daily for 365 days ($50 - $499)' },
-      { label: '🥈 Professional Plan', value: '2.5% daily for 365 days ($500 - $1,499)' },
-      { label: '🥇 Golden Plan', value: '5.0% daily for 365 days ($1,500 - $2,999)' },
-      { label: '💎 VIP Trial', value: '10% after 24 hours ($3,000 - $6,999)' },
-      { label: '👑 Investors Plan', value: '20% after 24 hours ($10,000+)' }
+    ${infoBox([
+      { label: 'BASIC PLAN', value: '1.5% daily for 365 days ($50 - $499)' },
+      { label: 'PROFESSIONAL', value: '2.5% daily for 365 days ($500 - $1,499)' },
+      { label: 'GOLDEN PLAN', value: '5.0% daily for 365 days ($1,500 - $2,999)' },
+      { label: 'VIP TRIAL', value: '10% after 24 hours ($3,000 - $6,999)' },
+      { label: 'INVESTORS PLAN', value: '20% after 24 hours ($10,000+)' }
     ])}
     
-    <div style="background-color: #2a2a2a; padding: 20px; border-radius: 5px; border-left: 4px solid #FFD700; margin: 30px 0;">
-      <p style="color: #ddd; margin: 0; line-height: 1.6;">
-        <strong style="color: #FFD700;">🔒 Security Tip:</strong> Keep your account credentials secure and enable two-factor authentication when available.
-      </p>
-    </div>
-    
-    <p style="color: #999; font-size: 14px; margin-top: 40px;">
-      Questions? Our support team is here to help at <a href="mailto:${process.env.ADMIN_EMAIL}" style="color: #FFD700;">${process.env.ADMIN_EMAIL}</a>
-    </p>
+    ${alertBox('Keep your account credentials secure at all times.', 'warning')}
   `);
   
-  return await sendEmail(email, 'Welcome to GoldNest - Account Approved! 🎉', emailWrapper(content));
+  return await sendEmail(email, 'Account Approved - GoldNest Investment', emailTemplate(content));
 };
-
-// ============================================================
-// 3. DEPOSIT PENDING EMAIL
-// ============================================================
 
 const sendDepositPending = async (email, username, amount, currency, plan) => {
-  const content = emailHeader('Deposit Received', '💰') + emailContent(`
-    <h2 style="color: #FFD700; margin: 0 0 20px 0;">Hello ${username},</h2>
-    <p style="color: #ddd; line-height: 1.8; font-size: 16px;">
-      We have received your deposit and it is currently being verified.
+  const content = contentSection(`
+    <h2 style="color: #FFD700 !important; margin: 0 0 20px 0; font-size: 24px; font-weight: normal;">
+      Deposit Received
+    </h2>
+    <p style="color: #cccccc !important; line-height: 1.8; font-size: 15px;">
+      Hello <strong style="color: #ffffff !important;">${username}</strong>, we have received your deposit and it is currently being verified.
     </p>
     
-    ${infoBox('Deposit Details', [
-      { label: '💵 Amount', value: `<span style="color: #FFD700; font-size: 24px; font-weight: bold;">$${amount}</span>` },
-      { label: '💱 Currency', value: currency.toUpperCase() },
-      { label: '📊 Plan', value: plan },
-      { label: '⏱️ Status', value: '<span style="color: #FFA500;">Pending Verification</span>' }
+    ${infoBox([
+      { label: 'AMOUNT', value: `<span style="color: #FFD700 !important; font-size: 22px; font-weight: bold;">$${amount}</span>` },
+      { label: 'CURRENCY', value: currency.toUpperCase() },
+      { label: 'PLAN', value: plan },
+      { label: 'STATUS', value: '<span style="color: #FFA500 !important;">PENDING VERIFICATION</span>' }
     ])}
     
-    <div style="background-color: #2a2a2a; padding: 20px; border-radius: 5px; margin: 20px 0; text-align: center;">
-      <p style="color: #FFD700; margin: 0; font-size: 18px; font-weight: bold;">
-        ⏱️ Verification Time: 1-24 hours
-      </p>
-      <p style="color: #ddd; margin: 10px 0 0 0; font-size: 14px;">
-        You'll receive a confirmation email once approved
-      </p>
-    </div>
+    ${alertBox('Verification typically takes 1-24 hours. You will receive a confirmation email once approved.', 'info')}
     
-    ${emailButton('http://goldnest-inc.biz/PostDashboard', 'View Dashboard')}
+    ${button('http://goldnest-inc.com/PostDashboard', 'VIEW DASHBOARD')}
   `);
   
-  return await sendEmail(email, `Deposit Received - $${amount} | GoldNest`, emailWrapper(content));
+  return await sendEmail(email, `Deposit Received - $${amount} | GoldNest`, emailTemplate(content));
 };
-
-// ============================================================
-// 4. DEPOSIT APPROVED EMAIL
-// ============================================================
 
 const sendDepositApproved = async (email, username, amount, currency, plan, expectedProfit) => {
-  const content = emailHeader('Deposit Approved!', '✅') + emailContent(`
-    <h2 style="color: #FFD700; margin: 0 0 20px 0;">Excellent News ${username}!</h2>
-    <p style="color: #ddd; line-height: 1.8; font-size: 16px;">
-      Your deposit has been <strong style="color: #00FF00;">verified and approved</strong>! Your investment is now active and generating returns.
+  const content = contentSection(`
+    <h2 style="color: #FFD700 !important; margin: 0 0 20px 0; font-size: 24px; font-weight: normal;">
+      Deposit Approved
+    </h2>
+    <p style="color: #cccccc !important; line-height: 1.8; font-size: 15px;">
+      Excellent news <strong style="color: #ffffff !important;">${username}</strong>! Your deposit has been verified and approved.
+    </p>
+    <p style="color: #cccccc !important; line-height: 1.8; font-size: 15px;">
+      Your investment is now active and generating returns.
     </p>
     
-    ${infoBox('Investment Summary', [
-      { label: '💵 Principal', value: `<span style="color: #FFD700; font-size: 24px; font-weight: bold;">$${amount}</span>` },
-      { label: '💱 Currency', value: currency.toUpperCase() },
-      { label: '📊 Plan', value: plan },
-      { label: '📈 Expected Profit', value: `<span style="color: #00FF00; font-weight: bold;">$${expectedProfit}</span>` },
-      { label: '✅ Status', value: '<span style="color: #00FF00; font-weight: bold;">ACTIVE</span>' }
+    ${infoBox([
+      { label: 'PRINCIPAL', value: `<span style="color: #FFD700 !important; font-size: 22px; font-weight: bold;">$${amount}</span>` },
+      { label: 'CURRENCY', value: currency.toUpperCase() },
+      { label: 'PLAN', value: plan },
+      { label: 'EXPECTED PROFIT', value: `<span style="color: #00FF00 !important; font-weight: bold;">$${expectedProfit}</span>` },
+      { label: 'STATUS', value: '<span style="color: #00FF00 !important; font-weight: bold;">ACTIVE</span>' }
     ])}
     
-    <div style="background: linear-gradient(135deg, #FFD700, #FFA500); padding: 25px; border-radius: 5px; margin: 30px 0; text-align: center;">
-      <p style="color: #000; margin: 0; font-size: 20px; font-weight: bold;">
-        🎯 Your profits are now accumulating!
-      </p>
-      <p style="color: #000; margin: 10px 0 0 0; font-size: 14px;">
-        Track your earnings in real-time on your dashboard
-      </p>
-    </div>
+    ${alertBox('Your profits are now accumulating. Track your earnings in real-time on your dashboard.', 'success')}
     
-    ${emailButton('http://goldnest-inc.biz/PostDashboard', 'View My Investments')}
+    ${button('http://goldnest-inc.com/PostDashboard', 'VIEW INVESTMENTS')}
   `);
   
-  return await sendEmail(email, `Investment Active! $${amount} Approved 🚀`, emailWrapper(content));
+  return await sendEmail(email, `Investment Active - $${amount} Approved`, emailTemplate(content));
 };
-
-// ============================================================
-// 5. WITHDRAWAL REQUESTED EMAIL
-// ============================================================
 
 const sendWithdrawalRequested = async (email, username, amount, currency, walletAddress) => {
-  const content = emailHeader('Withdrawal Request', '💸') + emailContent(`
-    <h2 style="color: #FFD700; margin: 0 0 20px 0;">Hello ${username},</h2>
-    <p style="color: #ddd; line-height: 1.8; font-size: 16px;">
-      Your withdrawal request has been received and is being processed.
+  const content = contentSection(`
+    <h2 style="color: #FFD700 !important; margin: 0 0 20px 0; font-size: 24px; font-weight: normal;">
+      Withdrawal Request
+    </h2>
+    <p style="color: #cccccc !important; line-height: 1.8; font-size: 15px;">
+      Hello <strong style="color: #ffffff !important;">${username}</strong>, your withdrawal request has been received and is being processed.
     </p>
     
-    ${infoBox('Withdrawal Details', [
-      { label: '💰 Amount', value: `<span style="color: #FFD700; font-size: 24px; font-weight: bold;">$${amount}</span>` },
-      { label: '💱 Currency', value: currency.toUpperCase() },
-      { label: '🏦 Wallet Address', value: `<code style="color: #FFA500; word-break: break-all; font-size: 12px;">${walletAddress}</code>` },
-      { label: '⏱️ Status', value: '<span style="color: #FFA500;">Processing</span>' }
+    ${infoBox([
+      { label: 'AMOUNT', value: `<span style="color: #FFD700 !important; font-size: 22px; font-weight: bold;">$${amount}</span>` },
+      { label: 'CURRENCY', value: currency.toUpperCase() },
+      { label: 'WALLET ADDRESS', value: `<code style="color: #FFA500 !important; word-break: break-all; font-size: 11px; font-family: monospace;">${walletAddress}</code>` },
+      { label: 'STATUS', value: '<span style="color: #FFA500 !important;">PROCESSING</span>' }
     ])}
     
-    <div style="background-color: #2a2a2a; padding: 20px; border-radius: 5px; margin: 20px 0;">
-      <p style="color: #ddd; margin: 0; line-height: 1.6;">
-        <strong style="color: #FFD700;">⏱️ Processing Time:</strong> 24-48 hours<br>
-        <strong style="color: #FFD700;">🔔 Next Step:</strong> You'll receive confirmation once payment is sent
-      </p>
-    </div>
+    ${alertBox('Processing time: 24-48 hours. You will receive confirmation once payment is sent.', 'info')}
   `);
   
-  return await sendEmail(email, `Withdrawal Processing - $${amount} ${currency.toUpperCase()}`, emailWrapper(content));
+  return await sendEmail(email, `Withdrawal Processing - $${amount} ${currency.toUpperCase()}`, emailTemplate(content));
 };
-
-// ============================================================
-// 6. WITHDRAWAL APPROVED EMAIL
-// ============================================================
 
 const sendWithdrawalApproved = async (email, username, amount, currency, walletAddress) => {
-  const content = emailHeader('Withdrawal Approved!', '✅') + emailContent(`
-    <h2 style="color: #FFD700; margin: 0 0 20px 0;">Withdrawal Approved ${username}!</h2>
-    <p style="color: #ddd; line-height: 1.8; font-size: 16px;">
-      Your withdrawal request has been <strong style="color: #00FF00;">approved</strong> and payment is being sent to your wallet.
+  const content = contentSection(`
+    <h2 style="color: #FFD700 !important; margin: 0 0 20px 0; font-size: 24px; font-weight: normal;">
+      Withdrawal Approved
+    </h2>
+    <p style="color: #cccccc !important; line-height: 1.8; font-size: 15px;">
+      <strong style="color: #ffffff !important;">${username}</strong>, your withdrawal request has been approved and payment is being sent to your wallet.
     </p>
     
-    ${infoBox('Withdrawal Confirmation', [
-      { label: '💰 Amount', value: `<span style="color: #00FF00; font-size: 24px; font-weight: bold;">$${amount}</span>` },
-      { label: '💱 Currency', value: currency.toUpperCase() },
-      { label: '🏦 Wallet Address', value: `<code style="color: #FFA500; word-break: break-all; font-size: 12px;">${walletAddress}</code>` },
-      { label: '✅ Status', value: '<span style="color: #00FF00; font-weight: bold;">COMPLETED</span>' }
+    ${infoBox([
+      { label: 'AMOUNT', value: `<span style="color: #00FF00 !important; font-size: 22px; font-weight: bold;">$${amount}</span>` },
+      { label: 'CURRENCY', value: currency.toUpperCase() },
+      { label: 'WALLET ADDRESS', value: `<code style="color: #FFA500 !important; word-break: break-all; font-size: 11px; font-family: monospace;">${walletAddress}</code>` },
+      { label: 'STATUS', value: '<span style="color: #00FF00 !important; font-weight: bold;">COMPLETED</span>' }
     ])}
     
-    <div style="background: linear-gradient(135deg, #00FF00, #00cc00); padding: 25px; border-radius: 5px; margin: 30px 0; text-align: center;">
-      <p style="color: #000; margin: 0; font-size: 20px; font-weight: bold;">
-        🎉 Your withdrawal has been processed!
-      </p>
-      <p style="color: #000; margin: 10px 0 0 0; font-size: 14px;">
-        Funds should arrive in your wallet within 24 hours
-      </p>
-    </div>
+    ${alertBox('Funds should arrive in your wallet within 24 hours.', 'success')}
   `);
   
-  return await sendEmail(email, `Withdrawal Approved! $${amount} Sent 💸`, emailWrapper(content));
+  return await sendEmail(email, `Withdrawal Approved - $${amount} Sent`, emailTemplate(content));
 };
 
-// ============================================================
-// 7. WITHDRAWAL REJECTED EMAIL
-// ============================================================
-
 const sendWithdrawalRejected = async (email, username, amount, currency, rejectionReason) => {
-  const content = emailHeader('Withdrawal Declined', '⚠️') + emailContent(`
-    <h2 style="color: #FFD700; margin: 0 0 20px 0;">Hello ${username},</h2>
-    <p style="color: #ddd; line-height: 1.8; font-size: 16px;">
-      Unfortunately, your withdrawal request has been <strong style="color: #ff4444;">declined</strong>.
+  const content = contentSection(`
+    <h2 style="color: #FFD700 !important; margin: 0 0 20px 0; font-size: 24px; font-weight: normal;">
+      Withdrawal Declined
+    </h2>
+    <p style="color: #cccccc !important; line-height: 1.8; font-size: 15px;">
+      Hello <strong style="color: #ffffff !important;">${username}</strong>, unfortunately your withdrawal request has been declined.
     </p>
     
-    ${infoBox('Withdrawal Details', [
-      { label: '💰 Amount', value: `$${amount} ${currency.toUpperCase()}` },
-      { label: '📅 Request Date', value: new Date().toLocaleDateString() },
-      { label: '❌ Status', value: 'REJECTED' }
+    ${infoBox([
+      { label: 'AMOUNT', value: `$${amount} ${currency.toUpperCase()}` },
+      { label: 'REQUEST DATE', value: new Date().toLocaleDateString() },
+      { label: 'STATUS', value: 'REJECTED' }
     ])}
     
-    <div style="background-color: #2a2a2a; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #ff4444;">
-      <h3 style="color: #FFD700; margin: 0 0 10px 0;">Reason for Rejection:</h3>
-      <p style="color: #ddd; margin: 0; line-height: 1.6;">
-        ${rejectionReason || 'No specific reason provided. Please contact support.'}
-      </p>
-    </div>
+    ${alertBox(`<strong>Reason:</strong> ${rejectionReason || 'Please contact support for details.'}`, 'danger')}
     
-    <p style="color: #ddd; line-height: 1.8; font-size: 16px;">
+    <p style="color: #cccccc !important; line-height: 1.8; font-size: 15px;">
       Your funds remain in your account balance and are available for future withdrawals or investments.
     </p>
     
-    ${emailButton('http://goldnest-inc.biz/support', 'Contact Support')}
-    
-    <p style="color: #999; font-size: 14px; margin-top: 30px; text-align: center;">
-      Need help? Email us at ${process.env.ADMIN_EMAIL}
-    </p>
+    ${button('http://goldnest-inc.com/support', 'CONTACT SUPPORT')}
   `);
   
-  return await sendEmail(email, `Withdrawal Declined - $${amount} ${currency.toUpperCase()}`, emailWrapper(content));
+  return await sendEmail(email, `Withdrawal Declined - $${amount} ${currency.toUpperCase()}`, emailTemplate(content));
 };
-
-// ============================================================
-// 8. PASSWORD CHANGED EMAIL
-// ============================================================
 
 const sendPasswordChanged = async (email, username, ipAddress) => {
-  const content = emailHeader('Security Alert', '🔒') + emailContent(`
-    <h2 style="color: #FFD700; margin: 0 0 20px 0;">Hello ${username},</h2>
-    <p style="color: #ddd; line-height: 1.8; font-size: 16px;">
-      Your password has been successfully changed.
+  const content = contentSection(`
+    <h2 style="color: #FFD700 !important; margin: 0 0 20px 0; font-size: 24px; font-weight: normal;">
+      Security Alert
+    </h2>
+    <p style="color: #cccccc !important; line-height: 1.8; font-size: 15px;">
+      Hello <strong style="color: #ffffff !important;">${username}</strong>, your password has been successfully changed.
     </p>
     
-    ${infoBox('Security Details', [
-      { label: '⏰ Time', value: new Date().toLocaleString() },
-      { label: '🌐 IP Address', value: ipAddress }
+    ${infoBox([
+      { label: 'TIME', value: new Date().toLocaleString() },
+      { label: 'IP ADDRESS', value: ipAddress }
     ])}
     
-    <div style="background-color: #ff4444; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #ff0000;">
-      <p style="color: #fff; margin: 0; font-weight: bold;">
-        ⚠️ Did not make this change?
-      </p>
-      <p style="color: #fff; margin: 10px 0 0 0;">
-        Contact us immediately at ${process.env.ADMIN_EMAIL}
-      </p>
-    </div>
+    ${alertBox('<strong>Did not make this change?</strong><br>Contact us immediately at ' + process.env.ADMIN_EMAIL, 'danger')}
     
-    ${emailButton('http://goldnest-inc.biz/login', 'Login with New Password')}
+    ${button('http://goldnest-inc.com/login', 'LOGIN NOW')}
   `);
   
-  return await sendEmail(email, '🔒 Password Changed - GoldNest Security Alert', emailWrapper(content));
+  return await sendEmail(email, 'Password Changed - GoldNest Security Alert', emailTemplate(content));
 };
-
-// ============================================================
-// 9. PASSWORD RESET CONFIRMATION EMAIL (Email 1 - NEW)
-// Matches first screenshot: "Password request confirmation"
-// ============================================================
 
 const sendPasswordResetConfirmation = async (email, username, token) => {
-  // Build reset URL with token
-  const resetUrl = `http://goldnest-inc.biz/?a=forgot_password&action=confirm&c=${token}`;
+  const resetUrl = `http://goldnest-inc.com/?a=forgot_password&action=confirm&c=${token}`;
   
-  // Simple HTML matching screenshot format
-  const html = `
-    <p>Hello ${username},</p>
+  const content = contentSection(`
+    <h2 style="color: #FFD700 !important; margin: 0 0 20px 0; font-size: 24px; font-weight: normal;">
+      Password Reset Request
+    </h2>
+    <p style="color: #cccccc !important; line-height: 1.8; font-size: 15px;">
+      Hello <strong style="color: #ffffff !important;">${username}</strong>, please confirm your request for password reset.
+    </p>
     
-    <p>Please confirm your request for password reset.</p>
+    ${alertBox('Click the button below to reset your password:', 'info')}
     
-    <p>Copy and paste this link to your browser:</p>
-    <p><a href="${resetUrl}" style="color: #4a9eff; word-break: break-all;">${resetUrl}</a></p>
+    ${button(resetUrl, 'RESET PASSWORD')}
     
-    <p>Thank you.</p>
-    <p><a href="http://goldnest-inc.biz" style="color: #4a9eff;">goldnest-inc.biz</a></p>
-  `;
+    <p style="color: #999999 !important; font-size: 13px; margin-top: 30px;">
+      Or copy this link to your browser:<br>
+      <a href="${resetUrl}" style="color: #FFD700 !important; word-break: break-all; font-size: 12px;">${resetUrl}</a>
+    </p>
+  `);
   
-  return await sendEmail(email, 'Password request confirmation', html);
+  return await sendEmail(email, 'Password Reset Request - GoldNest', emailTemplate(content));
 };
-
-// ============================================================
-// 10. PASSWORD RESET COMPLETE EMAIL (Email 2 - NEW)
-// Matches second screenshot: "The password you requested"
-// ============================================================
 
 const sendPasswordResetComplete = async (email, username, newPassword, ipAddress) => {
-  // Simple HTML matching screenshot format
-  const html = `
-    <p>Hello ${username},</p>
+  const content = contentSection(`
+    <h2 style="color: #FFD700 !important; margin: 0 0 20px 0; font-size: 24px; font-weight: normal;">
+      Password Reset Complete
+    </h2>
+    <p style="color: #cccccc !important; line-height: 1.8; font-size: 15px;">
+      Hello <strong style="color: #ffffff !important;">${username}</strong>, someone (most likely you) requested your password from IP <strong>${ipAddress}</strong>.
+    </p>
     
-    <p>Someone (most likely you) requested your username and password from the IP ${ipAddress}.</p>
-    <p><strong>Your password has been changed!!!</strong></p>
+    ${alertBox('<strong>Your password has been changed!</strong>', 'success')}
     
-    <p>You can log into our account with:</p>
+    ${infoBox([
+      { label: 'USERNAME', value: username },
+      { label: 'NEW PASSWORD', value: `<code style="color: #FFD700 !important; font-size: 16px; font-family: monospace;">${newPassword}</code>` }
+    ])}
     
-    <p><strong>Username:</strong> ${username}<br>
-    <strong>Password:</strong> ${newPassword}</p>
+    <p style="color: #cccccc !important; line-height: 1.8; font-size: 15px;">
+      You can now login to your account with this new password.
+    </p>
     
-    <p>Hope that helps.</p>
-  `;
+    ${button('http://goldnest-inc.com/login', 'LOGIN NOW')}
+  `);
   
-  return await sendEmail(email, 'The password you requested', html);
+  return await sendEmail(email, 'Your New Password - GoldNest', emailTemplate(content));
 };
-
-// ============================================================
-// 11. ADMIN NEW USER NOTIFICATION
-// ============================================================
 
 const sendAdminNewUserNotification = async (username, email) => {
   const adminEmail = process.env.ADMIN_EMAIL;
-  const subject = `🆕 New User Registration: ${username}`;
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4;">
-      <h2 style="color: #333;">New User Registration</h2>
-      <div style="background: white; padding: 20px; border-radius: 5px;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Username:</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${username}</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Email:</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${email}</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Status:</td>
-            <td style="padding: 10px; border: 1px solid #ddd;"><span style="color: orange; font-weight: bold;">PENDING APPROVAL</span></td>
-          </tr>
-        </table>
-        <p style="margin-top: 20px;">
-          <a href="http://goldnest-inc.biz/admin/users" style="background-color: #007bff; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
-            Review User
-          </a>
-        </p>
-      </div>
-    </div>
-  `;
+  const content = contentSection(`
+    <h2 style="color: #FFD700 !important; margin: 0 0 20px 0; font-size: 24px; font-weight: normal;">
+      New User Registration
+    </h2>
+    
+    ${infoBox([
+      { label: 'USERNAME', value: username },
+      { label: 'EMAIL', value: email },
+      { label: 'STATUS', value: '<span style="color: #FFA500 !important; font-weight: bold;">PENDING APPROVAL</span>' }
+    ])}
+    
+    ${button('http://goldnest-inc.com/admin/users', 'REVIEW USER')}
+  `);
   
-  return await sendEmail(adminEmail, subject, html);
+  return await sendEmail(adminEmail, `New Registration: ${username}`, emailTemplate(content));
 };
 
-// ============================================================
-// 12. ADMIN DEPOSIT NOTIFICATION
-// ============================================================
-
-const sendAdminDepositNotification = async (username, email, amount, currency, plan) => {
+const sendAdminDepositNotification = async (username, amount, currency, plan) => {
   const adminEmail = process.env.ADMIN_EMAIL;
-  const subject = `💰 New Deposit: $${amount} from ${username}`;
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4;">
-      <h2 style="color: #333;">New Deposit Request</h2>
-      <div style="background: white; padding: 20px; border-radius: 5px;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">User:</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${username} (${email})</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Amount:</td>
-            <td style="padding: 10px; border: 1px solid #ddd;"><strong style="color: green; font-size: 18px;">$${amount}</strong></td>
-          </tr>
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Currency:</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${currency.toUpperCase()}</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Plan:</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${plan}</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Status:</td>
-            <td style="padding: 10px; border: 1px solid #ddd;"><span style="color: orange; font-weight: bold;">PENDING VERIFICATION</span></td>
-          </tr>
-        </table>
-        <p style="margin-top: 20px;">
-          <a href="http://goldnest-inc.biz/admin/deposits" style="background-color: #28a745; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
-            Review Deposit
-          </a>
-        </p>
-      </div>
-    </div>
-  `;
+  const content = contentSection(`
+    <h2 style="color: #FFD700 !important; margin: 0 0 20px 0; font-size: 24px; font-weight: normal;">
+      New Deposit Request
+    </h2>
+    
+    ${infoBox([
+      { label: 'USER', value: username },
+      { label: 'AMOUNT', value: `<span style="color: #00FF00 !important; font-size: 22px; font-weight: bold;">$${amount}</span>` },
+      { label: 'CURRENCY', value: currency.toUpperCase() },
+      { label: 'PLAN', value: plan },
+      { label: 'STATUS', value: '<span style="color: #FFA500 !important; font-weight: bold;">PENDING VERIFICATION</span>' }
+    ])}
+    
+    ${button('http://goldnest-inc.com/admin/deposits', 'REVIEW DEPOSIT')}
+  `);
   
-  return await sendEmail(adminEmail, subject, html);
+  return await sendEmail(adminEmail, `New Deposit: $${amount} from ${username}`, emailTemplate(content));
 };
 
-// ============================================================
-// 13. ADMIN WITHDRAWAL NOTIFICATION
-// ============================================================
-
-const sendAdminWithdrawalNotification = async (username, email, amount, currency, walletAddress) => {
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const subject = `💸 New Withdrawal: $${amount} ${currency.toUpperCase()} from ${username}`;
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4;">
-      <h2 style="color: #333;">New Withdrawal Request</h2>
-      <div style="background: white; padding: 20px; border-radius: 5px;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">User:</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${username} (${email})</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Amount:</td>
-            <td style="padding: 10px; border: 1px solid #ddd;"><strong style="color: red; font-size: 18px;">$${amount}</strong></td>
-          </tr>
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Currency:</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${currency.toUpperCase()}</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Wallet:</td>
-            <td style="padding: 10px; border: 1px solid #ddd;"><code style="word-break: break-all;">${walletAddress}</code></td>
-          </tr>
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Status:</td>
-            <td style="padding: 10px; border: 1px solid #ddd;"><span style="color: orange; font-weight: bold;">AWAITING APPROVAL</span></td>
-          </tr>
-        </table>
-        <p style="margin-top: 20px;">
-          <a href="http://goldnest-inc.biz/admin/withdrawals" style="background-color: #dc3545; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
-            Review Withdrawal
-          </a>
-        </p>
-      </div>
-    </div>
-  `;
+const sendAdminWithdrawalNotification = async (adminEmail, username, amount, currency, walletAddress) => {
+  const content = contentSection(`
+    <h2 style="color: #FFD700 !important; margin: 0 0 20px 0; font-size: 24px; font-weight: normal;">
+      New Withdrawal Request
+    </h2>
+    
+    ${infoBox([
+      { label: 'USER', value: username },
+      { label: 'AMOUNT', value: `<span style="color: #FF4444 !important; font-size: 22px; font-weight: bold;">$${amount}</span>` },
+      { label: 'CURRENCY', value: currency.toUpperCase() },
+      { label: 'WALLET', value: `<code style="color: #FFA500 !important; word-break: break-all; font-size: 11px; font-family: monospace;">${walletAddress}</code>` },
+      { label: 'STATUS', value: '<span style="color: #FFA500 !important; font-weight: bold;">AWAITING APPROVAL</span>' }
+    ])}
+    
+    ${button('http://goldnest-inc.com/admin/withdrawals', 'REVIEW WITHDRAWAL')}
+  `);
   
-  return await sendEmail(adminEmail, subject, html);
+  return await sendEmail(adminEmail, `New Withdrawal: $${amount} ${currency.toUpperCase()} from ${username}`, emailTemplate(content));
+};
+
+const sendSupportEmail = async (adminEmail, userName, userEmail, message) => {
+  const content = contentSection(`
+    <h2 style="color: #FFD700 !important; margin: 0 0 20px 0; font-size: 24px; font-weight: normal;">
+      New Support Request
+    </h2>
+    
+    ${infoBox([
+      { label: 'FROM', value: userName },
+      { label: 'EMAIL', value: `<a href="mailto:${userEmail}" style="color: #FFD700 !important; text-decoration: none;">${userEmail}</a>` },
+      { label: 'RECEIVED', value: new Date().toLocaleString() }
+    ])}
+    
+    <div style="background-color: #0a0a0a !important; border: 1px solid #333333; padding: 20px; margin: 25px 0;">
+      <div style="color: #999999 !important; font-size: 12px; margin-bottom: 10px;">MESSAGE:</div>
+      <div style="color: #ffffff !important; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${message}</div>
+    </div>
+    
+    ${alertBox('<strong>Action Required:</strong> Please respond to this inquiry within 24 hours.', 'warning')}
+    
+    ${button(`mailto:${userEmail}`, 'REPLY TO USER')}
+  `);
+  
+  return await sendEmail(adminEmail, `Support Request from ${userName}`, emailTemplate(content));
 };
 
 // ============================================================
@@ -603,12 +543,13 @@ module.exports = {
   sendDepositApproved,
   sendWithdrawalRequested,
   sendWithdrawalApproved,
-  sendWithdrawalRejected, // NEW - Add rejection email
+  sendWithdrawalRejected,
   sendPasswordChanged,
-  sendPasswordResetConfirmation, // NEW - Email 1
-  sendPasswordResetComplete, // NEW - Email 2
+  sendPasswordResetConfirmation,
+  sendPasswordResetComplete,
   sendAdminNewUserNotification,
   sendAdminDepositNotification,
   sendAdminWithdrawalNotification,
-  transporter, // Export for testing
+  sendSupportEmail,
+  transporter,
 };

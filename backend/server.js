@@ -29,7 +29,7 @@ app.use(helmet());
 app.use(mongoSanitize());
 
 app.use(cors({
-  origin: (process.env.CORS_ORIGIN || 'http://localhost:5173,https://goldnest-inc.vercel.app')
+  origin: (process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:3000,https://goldnest-inc.vercel.app,https://goldnest-inc.com,https://www.goldnest-inc.com')
     .split(',')
     .map(origin => origin.trim()), // remove any accidental spaces
   credentials: true,
@@ -164,6 +164,15 @@ try {
 try {
   const referralRoutes = require('./routes/referralRoutes');
   app.use('/api/referrals', referralRoutes);
+  console.log('✅ Referral routes loaded');
+} catch (err) {
+  console.error('❌ Error loading referral routes:', err.message);
+}
+
+
+try {
+ const supportRoutes = require('./routes/supportRoutes');
+ app.use('/api/support', supportRoutes);
   console.log('✅ Referral routes loaded');
 } catch (err) {
   console.error('❌ Error loading referral routes:', err.message);
