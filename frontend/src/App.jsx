@@ -31,7 +31,8 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import AdminRoute from "./components/AdminRoute.jsx";
 
 function App() {
-  return (
+  return ( 
+  <div className="w-full min-h-screen m-0 p-0">
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
@@ -198,6 +199,7 @@ function App() {
         />
       </Routes>
     </Router>
+    </div>
   );
 }
 
