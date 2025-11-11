@@ -149,7 +149,7 @@ const UsersManagement = () => {
     };
 
     return (
-      <span className={`px-3 py-1 rounded-full text-xs border font-semibold ${styles[userStatus] || styles.active}`}>
+      <span className={`px-2 md:px-3 py-1 rounded-full text-xs border font-semibold ${styles[userStatus] || styles.active}`}>
         {userStatus.toUpperCase()}
       </span>
     );
@@ -157,11 +157,11 @@ const UsersManagement = () => {
 
   const getRoleBadge = (role) => {
     return role === "admin" ? (
-      <span className="px-3 py-1 rounded-full text-xs border border-purple-500 bg-purple-500/20 text-purple-400 font-semibold">
+      <span className="px-2 md:px-3 py-1 rounded-full text-xs border border-purple-500 bg-purple-500/20 text-purple-400 font-semibold">
         ADMIN
       </span>
     ) : (
-      <span className="px-3 py-1 rounded-full text-xs border border-blue-500 bg-blue-500/20 text-blue-400 font-semibold">
+      <span className="px-2 md:px-3 py-1 rounded-full text-xs border border-blue-500 bg-blue-500/20 text-blue-400 font-semibold">
         USER
       </span>
     );
@@ -171,16 +171,16 @@ const UsersManagement = () => {
     <div className="min-h-screen bg-[#111] text-white font-sans">
       <AdminNavbar />
 
-      <main className="px-4 md:px-10 lg:px-20 py-10">
+      <main className="px-4 md:px-10 lg:px-20 py-6 md:py-10">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Users Management</h1>
-            <p className="text-gray-400">Manage all platform users</p>
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">Users Management</h1>
+            <p className="text-sm md:text-base text-gray-400">Manage all platform users</p>
           </div>
           <button
             onClick={fetchUsers}
-            className="mt-4 md:mt-0 bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded font-semibold flex items-center space-x-2"
+            className="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded font-semibold flex items-center justify-center space-x-2"
           >
             <RefreshCw className="w-4 h-4" />
             <span>Refresh</span>
@@ -188,27 +188,27 @@ const UsersManagement = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-black border border-[#222] rounded-lg p-6 mb-6">
+        <div className="bg-black border border-[#222] rounded-lg p-4 md:p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" />
               <input
                 type="text"
+                placeholder="Search by username or email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search by username or email..."
-                className="w-full bg-[#1a1a1a] border border-gray-700 rounded pl-10 pr-4 py-2 text-white focus:outline-none focus:border-yellow-500"
+                className="w-full bg-[#1a1a1a] border border-gray-700 rounded pl-9 md:pl-10 pr-4 py-2 text-white placeholder-gray-500 text-sm md:text-base"
               />
             </div>
 
             {/* Status Filter */}
             <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" />
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full bg-[#1a1a1a] border border-gray-700 rounded pl-10 pr-4 py-2 text-white focus:outline-none focus:border-yellow-500 cursor-pointer"
+                className="w-full bg-[#1a1a1a] border border-gray-700 rounded pl-9 md:pl-10 pr-4 py-2 text-white text-sm md:text-base appearance-none cursor-pointer"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -219,7 +219,7 @@ const UsersManagement = () => {
           </div>
         </div>
 
-        {/* Users Table */}
+        {/* Users Table/Cards */}
         <div className="bg-black border border-[#222] rounded-lg overflow-hidden">
           {loading ? (
             <div className="text-center py-12">
@@ -231,100 +231,193 @@ const UsersManagement = () => {
               <p className="text-gray-400">No users found</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-[#1a1a1a]">
-                  <tr className="border-b border-gray-700">
-                    <th className="py-4 px-4 text-left text-sm font-semibold text-yellow-400">Username</th>
-                    <th className="py-4 px-4 text-left text-sm font-semibold text-yellow-400">Email</th>
-                    <th className="py-4 px-4 text-left text-sm font-semibold text-yellow-400">Role</th>
-                    <th className="py-4 px-4 text-left text-sm font-semibold text-yellow-400">Status</th>
-                    <th className="py-4 px-4 text-left text-sm font-semibold text-yellow-400">Balance</th>
-                    <th className="py-4 px-4 text-left text-sm font-semibold text-yellow-400">Joined</th>
-                    <th className="py-4 px-4 text-left text-sm font-semibold text-yellow-400">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredUsers.map((user) => (
-                    <tr key={user._id} className="border-b border-gray-800 hover:bg-[#1a1a1a] transition">
-                      <td className="py-4 px-4">
-                        <div className="font-semibold text-white">{user.username}</div>
-                      </td>
-                      <td className="py-4 px-4 text-gray-300">{user.email}</td>
-                      <td className="py-4 px-4">{getRoleBadge(user.role)}</td>
-                      <td className="py-4 px-4">{getStatusBadge(user.status)}</td>
-                      <td className="py-4 px-4">
-                        <div className="text-sm">
-                          <div className="text-yellow-400 font-semibold">
-                            ${(user.accountBalance || 0).toFixed(2)}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4 text-gray-400 text-sm">
-                        {formatDateTime(user.createdAt)}
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center space-x-2">
-                          {(user.status === "pending" || !user.status) && (
-                            <button
-                              onClick={() => handleApproveUser(user._id)}
-                              className="p-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded transition"
-                              title="Approve User"
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                            </button>
-                          )}
-                          {user.status === "active" && (
-                            <button
-                              onClick={() => handleDeactivateUser(user._id)}
-                              className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition"
-                              title="Deactivate User"
-                            >
-                              <XCircle className="w-4 h-4" />
-                            </button>
-                          )}
-                          {user.status === "deactivated" && (
-                            <button
-                              onClick={() => handleActivateUser(user._id)}
-                              className="p-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded transition"
-                              title="Activate User"
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                            </button>
-                          )}
-                          <button
-                            onClick={() => {
-                              setSelectedUser(user);
-                              setShowBalanceModal(true);
-                            }}
-                            className="p-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded transition"
-                            title="Update Balance"
-                          >
-                            <DollarSign className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => navigate(`/admin/users/${user._id}`)}
-                            className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded transition"
-                            title="View Details"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          {user.role !== "admin" && (
-                            <button
-                              onClick={() => handleDeleteUser(user._id)}
-                              className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition"
-                              title="Delete User"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                      </td>
+            <>
+              {/* Desktop Table */}
+              <div className="hidden lg:block overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-[#1a1a1a]">
+                    <tr className="border-b border-gray-700">
+                      <th className="py-4 px-4 text-left text-sm font-semibold text-yellow-400">Username</th>
+                      <th className="py-4 px-4 text-left text-sm font-semibold text-yellow-400">Email</th>
+                      <th className="py-4 px-4 text-left text-sm font-semibold text-yellow-400">Role</th>
+                      <th className="py-4 px-4 text-left text-sm font-semibold text-yellow-400">Status</th>
+                      <th className="py-4 px-4 text-left text-sm font-semibold text-yellow-400">Balance</th>
+                      <th className="py-4 px-4 text-left text-sm font-semibold text-yellow-400">Joined</th>
+                      <th className="py-4 px-4 text-left text-sm font-semibold text-yellow-400">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {filteredUsers.map((user) => (
+                      <tr key={user._id} className="border-b border-gray-800 hover:bg-[#1a1a1a] transition">
+                        <td className="py-4 px-4">
+                          <div className="font-semibold text-white">{user.username}</div>
+                        </td>
+                        <td className="py-4 px-4 text-gray-300">{user.email}</td>
+                        <td className="py-4 px-4">{getRoleBadge(user.role)}</td>
+                        <td className="py-4 px-4">{getStatusBadge(user.status)}</td>
+                        <td className="py-4 px-4">
+                          <div className="text-sm">
+                            <div className="text-yellow-400 font-semibold">
+                              ${(user.accountBalance || 0).toFixed(2)}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 text-gray-400 text-sm">
+                          {formatDateTime(user.createdAt)}
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex items-center space-x-2">
+                            {(user.status === "pending" || !user.status) && (
+                              <button
+                                onClick={() => handleApproveUser(user._id)}
+                                className="p-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded transition"
+                                title="Approve User"
+                              >
+                                <CheckCircle className="w-4 h-4" />
+                              </button>
+                            )}
+                            {user.status === "active" && (
+                              <button
+                                onClick={() => handleDeactivateUser(user._id)}
+                                className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition"
+                                title="Deactivate User"
+                              >
+                                <XCircle className="w-4 h-4" />
+                              </button>
+                            )}
+                            {user.status === "deactivated" && (
+                              <button
+                                onClick={() => handleActivateUser(user._id)}
+                                className="p-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded transition"
+                                title="Activate User"
+                              >
+                                <CheckCircle className="w-4 h-4" />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => {
+                                setSelectedUser(user);
+                                setShowBalanceModal(true);
+                              }}
+                              className="p-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded transition"
+                              title="Update Balance"
+                            >
+                              <DollarSign className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => navigate(`/admin/users/${user._id}`)}
+                              className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded transition"
+                              title="View Details"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            {user.role !== "admin" && (
+                              <button
+                                onClick={() => handleDeleteUser(user._id)}
+                                className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition"
+                                title="Delete User"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Cards */}
+              <div className="lg:hidden p-4 space-y-4">
+                {filteredUsers.map((user) => (
+                  <div key={user._id} className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-4">
+                    {/* Header */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-white text-sm mb-1">{user.username}</h3>
+                        <p className="text-xs text-gray-400 break-all">{user.email}</p>
+                      </div>
+                      <div className="flex flex-col gap-2 ml-2">
+                        {getRoleBadge(user.role)}
+                        {getStatusBadge(user.status)}
+                      </div>
+                    </div>
+
+                    {/* Details */}
+                    <div className="space-y-2 mb-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500">Balance</span>
+                        <span className="text-sm font-semibold text-yellow-400">
+                          ${(user.accountBalance || 0).toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500">Joined</span>
+                        <span className="text-xs text-gray-400">{formatDateTime(user.createdAt)}</span>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="grid grid-cols-2 gap-2 pt-3 border-t border-gray-800">
+                      {(user.status === "pending" || !user.status) && (
+                        <button
+                          onClick={() => handleApproveUser(user._id)}
+                          className="bg-green-500/20 hover:bg-green-500/30 text-green-400 py-2 rounded text-xs font-semibold transition flex items-center justify-center gap-1"
+                        >
+                          <CheckCircle className="w-3 h-3" />
+                          <span>Approve</span>
+                        </button>
+                      )}
+                      {user.status === "active" && (
+                        <button
+                          onClick={() => handleDeactivateUser(user._id)}
+                          className="bg-red-500/20 hover:bg-red-500/30 text-red-400 py-2 rounded text-xs font-semibold transition flex items-center justify-center gap-1"
+                        >
+                          <XCircle className="w-3 h-3" />
+                          <span>Deactivate</span>
+                        </button>
+                      )}
+                      {user.status === "deactivated" && (
+                        <button
+                          onClick={() => handleActivateUser(user._id)}
+                          className="bg-green-500/20 hover:bg-green-500/30 text-green-400 py-2 rounded text-xs font-semibold transition flex items-center justify-center gap-1"
+                        >
+                          <CheckCircle className="w-3 h-3" />
+                          <span>Activate</span>
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setShowBalanceModal(true);
+                        }}
+                        className="bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 py-2 rounded text-xs font-semibold transition flex items-center justify-center gap-1"
+                      >
+                        <DollarSign className="w-3 h-3" />
+                        <span>Balance</span>
+                      </button>
+                      <button
+                        onClick={() => navigate(`/admin/users/${user._id}`)}
+                        className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 py-2 rounded text-xs font-semibold transition flex items-center justify-center gap-1"
+                      >
+                        <Eye className="w-3 h-3" />
+                        <span>View</span>
+                      </button>
+                      {user.role !== "admin" && (
+                        <button
+                          onClick={() => handleDeleteUser(user._id)}
+                          className="bg-red-500/20 hover:bg-red-500/30 text-red-400 py-2 rounded text-xs font-semibold transition flex items-center justify-center gap-1"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          <span>Delete</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </main>
@@ -332,18 +425,18 @@ const UsersManagement = () => {
       {/* Balance Update Modal */}
       {showBalanceModal && selectedUser && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a1a1a] border border-yellow-500 rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-xl font-semibold text-yellow-400 mb-4">
+          <div className="bg-[#1a1a1a] border border-yellow-500 rounded-lg p-4 md:p-6 max-w-md w-full">
+            <h3 className="text-lg md:text-xl font-semibold text-yellow-400 mb-4">
               Update Balance - {selectedUser.username}
             </h3>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-300 mb-2">Currency</label>
+                <label className="block text-xs md:text-sm text-gray-300 mb-2">Currency</label>
                 <select
                   value={balanceForm.currency}
                   onChange={(e) => setBalanceForm({ ...balanceForm, currency: e.target.value })}
-                  className="w-full bg-black border border-gray-700 rounded px-4 py-2 text-white"
+                  className="w-full bg-black border border-gray-700 rounded px-3 md:px-4 py-2 text-white text-sm md:text-base"
                 >
                   <option value="account">Account Balance (USD)</option>
                   <option value="btc">Bitcoin (BTC)</option>
@@ -354,11 +447,11 @@ const UsersManagement = () => {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-300 mb-2">Action</label>
+                <label className="block text-xs md:text-sm text-gray-300 mb-2">Action</label>
                 <select
                   value={balanceForm.action}
                   onChange={(e) => setBalanceForm({ ...balanceForm, action: e.target.value })}
-                  className="w-full bg-black border border-gray-700 rounded px-4 py-2 text-white"
+                  className="w-full bg-black border border-gray-700 rounded px-3 md:px-4 py-2 text-white text-sm md:text-base"
                 >
                   <option value="add">Add</option>
                   <option value="subtract">Subtract</option>
@@ -367,18 +460,18 @@ const UsersManagement = () => {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-300 mb-2">Amount</label>
+                <label className="block text-xs md:text-sm text-gray-300 mb-2">Amount</label>
                 <input
                   type="number"
                   value={balanceForm.amount}
                   onChange={(e) => setBalanceForm({ ...balanceForm, amount: e.target.value })}
-                  className="w-full bg-black border border-gray-700 rounded px-4 py-2 text-white"
+                  className="w-full bg-black border border-gray-700 rounded px-3 md:px-4 py-2 text-white text-sm md:text-base"
                   placeholder="0.00"
                   step="0.0001"
                 />
               </div>
 
-              <div className="flex space-x-3 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <button
                   onClick={handleUpdateBalance}
                   className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-black py-2 rounded font-semibold"

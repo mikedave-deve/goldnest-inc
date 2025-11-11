@@ -75,7 +75,7 @@ const AdminSettings = () => {
     return (
       <div className="min-h-screen bg-[#111]">
         <AdminNavbar />
-        <div className="flex items-center justify-center h-screen">
+        <div className="flex items-center justify-center h-screen px-4">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4"></div>
             <p className="text-yellow-400">Loading settings...</p>
@@ -89,16 +89,16 @@ const AdminSettings = () => {
     <div className="min-h-screen bg-[#111] text-white font-sans">
       <AdminNavbar />
 
-      <main className="px-4 md:px-10 lg:px-20 py-10">
+      <main className="px-4 md:px-10 lg:px-20 py-6 md:py-10">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Platform Settings</h1>
-            <p className="text-gray-400">Configure platform parameters</p>
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">Platform Settings</h1>
+            <p className="text-sm md:text-base text-gray-400">Configure platform parameters</p>
           </div>
           <button
             onClick={fetchSettings}
-            className="mt-4 md:mt-0 bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded font-semibold flex items-center space-x-2"
+            className="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded font-semibold flex items-center justify-center space-x-2"
           >
             <RefreshCw className="w-4 h-4" />
             <span>Refresh</span>
@@ -107,10 +107,10 @@ const AdminSettings = () => {
 
         <div className="max-w-4xl mx-auto">
           {/* General Settings */}
-          <div className="bg-black border border-[#222] rounded-lg p-6 mb-6">
+          <div className="bg-black border border-[#222] rounded-lg p-4 md:p-6 mb-6">
             <div className="flex items-center space-x-3 mb-6">
-              <SettingsIcon className="w-6 h-6 text-yellow-400" />
-              <h2 className="text-xl font-semibold text-yellow-400">General Settings</h2>
+              <SettingsIcon className="w-5 h-5 md:w-6 md:h-6 text-yellow-400" />
+              <h2 className="text-lg md:text-xl font-semibold text-yellow-400">General Settings</h2>
             </div>
 
             <div className="space-y-4">
@@ -120,7 +120,7 @@ const AdminSettings = () => {
                   type="text"
                   value={settings.siteName}
                   onChange={(e) => handleChange("siteName", e.target.value)}
-                  className="w-full bg-[#1a1a1a] border border-gray-700 rounded px-4 py-2 text-white"
+                  className="w-full bg-[#1a1a1a] border border-gray-700 rounded px-3 md:px-4 py-2 text-white text-sm md:text-base"
                 />
               </div>
 
@@ -130,18 +130,18 @@ const AdminSettings = () => {
                   type="email"
                   value={settings.siteEmail}
                   onChange={(e) => handleChange("siteEmail", e.target.value)}
-                  className="w-full bg-[#1a1a1a] border border-gray-700 rounded px-4 py-2 text-white"
+                  className="w-full bg-[#1a1a1a] border border-gray-700 rounded px-3 md:px-4 py-2 text-white text-sm md:text-base"
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm text-gray-300 mb-2">Minimum Deposit ($)</label>
                   <input
                     type="number"
                     value={settings.minDeposit}
                     onChange={(e) => handleChange("minDeposit", parseFloat(e.target.value))}
-                    className="w-full bg-[#1a1a1a] border border-gray-700 rounded px-4 py-2 text-white"
+                    className="w-full bg-[#1a1a1a] border border-gray-700 rounded px-3 md:px-4 py-2 text-white text-sm md:text-base"
                     step="1"
                   />
                 </div>
@@ -152,20 +152,20 @@ const AdminSettings = () => {
                     type="number"
                     value={settings.minWithdrawal}
                     onChange={(e) => handleChange("minWithdrawal", parseFloat(e.target.value))}
-                    className="w-full bg-[#1a1a1a] border border-gray-700 rounded px-4 py-2 text-white"
+                    className="w-full bg-[#1a1a1a] border border-gray-700 rounded px-3 md:px-4 py-2 text-white text-sm md:text-base"
                     step="1"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm text-gray-300 mb-2">Deposit Fee (%)</label>
                   <input
                     type="number"
                     value={settings.depositFee}
                     onChange={(e) => handleChange("depositFee", parseFloat(e.target.value))}
-                    className="w-full bg-[#1a1a1a] border border-gray-700 rounded px-4 py-2 text-white"
+                    className="w-full bg-[#1a1a1a] border border-gray-700 rounded px-3 md:px-4 py-2 text-white text-sm md:text-base"
                     step="0.1"
                   />
                 </div>
@@ -176,7 +176,7 @@ const AdminSettings = () => {
                     type="number"
                     value={settings.withdrawalFee}
                     onChange={(e) => handleChange("withdrawalFee", parseFloat(e.target.value))}
-                    className="w-full bg-[#1a1a1a] border border-gray-700 rounded px-4 py-2 text-white"
+                    className="w-full bg-[#1a1a1a] border border-gray-700 rounded px-3 md:px-4 py-2 text-white text-sm md:text-base"
                     step="0.1"
                   />
                 </div>
@@ -187,7 +187,7 @@ const AdminSettings = () => {
                     type="number"
                     value={settings.referralCommission}
                     onChange={(e) => handleChange("referralCommission", parseFloat(e.target.value))}
-                    className="w-full bg-[#1a1a1a] border border-gray-700 rounded px-4 py-2 text-white"
+                    className="w-full bg-[#1a1a1a] border border-gray-700 rounded px-3 md:px-4 py-2 text-white text-sm md:text-base"
                     step="0.1"
                   />
                 </div>
@@ -196,16 +196,16 @@ const AdminSettings = () => {
           </div>
 
           {/* Feature Toggles */}
-          <div className="bg-black border border-[#222] rounded-lg p-6 mb-6">
-            <h2 className="text-xl font-semibold text-yellow-400 mb-6">Feature Toggles</h2>
+          <div className="bg-black border border-[#222] rounded-lg p-4 md:p-6 mb-6">
+            <h2 className="text-lg md:text-xl font-semibold text-yellow-400 mb-6">Feature Toggles</h2>
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-[#1a1a1a] rounded">
-                <div>
-                  <p className="font-semibold text-white">Maintenance Mode</p>
-                  <p className="text-sm text-gray-400">Disable site access for users</p>
+              <div className="flex items-center justify-between p-3 md:p-4 bg-[#1a1a1a] rounded">
+                <div className="flex-1 pr-4">
+                  <p className="font-semibold text-white text-sm md:text-base">Maintenance Mode</p>
+                  <p className="text-xs md:text-sm text-gray-400">Disable site access for users</p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                   <input
                     type="checkbox"
                     checked={settings.maintenanceMode}
@@ -216,12 +216,12 @@ const AdminSettings = () => {
                 </label>
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-[#1a1a1a] rounded">
-                <div>
-                  <p className="font-semibold text-white">Allow Registration</p>
-                  <p className="text-sm text-gray-400">Enable new user registrations</p>
+              <div className="flex items-center justify-between p-3 md:p-4 bg-[#1a1a1a] rounded">
+                <div className="flex-1 pr-4">
+                  <p className="font-semibold text-white text-sm md:text-base">Allow Registration</p>
+                  <p className="text-xs md:text-sm text-gray-400">Enable new user registrations</p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                   <input
                     type="checkbox"
                     checked={settings.allowRegistration}
@@ -232,12 +232,12 @@ const AdminSettings = () => {
                 </label>
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-[#1a1a1a] rounded">
-                <div>
-                  <p className="font-semibold text-white">Require Email Verification</p>
-                  <p className="text-sm text-gray-400">Users must verify email</p>
+              <div className="flex items-center justify-between p-3 md:p-4 bg-[#1a1a1a] rounded">
+                <div className="flex-1 pr-4">
+                  <p className="font-semibold text-white text-sm md:text-base">Require Email Verification</p>
+                  <p className="text-xs md:text-sm text-gray-400">Users must verify email</p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                   <input
                     type="checkbox"
                     checked={settings.requireEmailVerification}
@@ -248,12 +248,12 @@ const AdminSettings = () => {
                 </label>
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-[#1a1a1a] rounded">
-                <div>
-                  <p className="font-semibold text-white">Auto-Approve Deposits</p>
-                  <p className="text-sm text-gray-400">Automatically approve deposits</p>
+              <div className="flex items-center justify-between p-3 md:p-4 bg-[#1a1a1a] rounded">
+                <div className="flex-1 pr-4">
+                  <p className="font-semibold text-white text-sm md:text-base">Auto-Approve Deposits</p>
+                  <p className="text-xs md:text-sm text-gray-400">Automatically approve deposits</p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                   <input
                     type="checkbox"
                     checked={settings.autoApproveDeposits}
@@ -264,12 +264,12 @@ const AdminSettings = () => {
                 </label>
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-[#1a1a1a] rounded">
-                <div>
-                  <p className="font-semibold text-white">Auto-Approve Withdrawals</p>
-                  <p className="text-sm text-gray-400">Automatically approve withdrawals</p>
+              <div className="flex items-center justify-between p-3 md:p-4 bg-[#1a1a1a] rounded">
+                <div className="flex-1 pr-4">
+                  <p className="font-semibold text-white text-sm md:text-base">Auto-Approve Withdrawals</p>
+                  <p className="text-xs md:text-sm text-gray-400">Automatically approve withdrawals</p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                   <input
                     type="checkbox"
                     checked={settings.autoApproveWithdrawals}
@@ -287,13 +287,13 @@ const AdminSettings = () => {
             <button
               onClick={handleSave}
               disabled={saving}
-              className={`px-8 py-3 rounded font-semibold flex items-center space-x-2 transition ${
+              className={`w-full sm:w-auto px-6 md:px-8 py-3 rounded font-semibold flex items-center justify-center space-x-2 transition ${
                 saving
                   ? "bg-gray-600 text-gray-400 cursor-not-allowed"
                   : "bg-green-500 hover:bg-green-600 text-white"
               }`}
             >
-              <Save className="w-5 h-5" />
+              <Save className="w-4 h-4 md:w-5 md:h-5" />
               <span>{saving ? "Saving..." : "Save Settings"}</span>
             </button>
           </div>

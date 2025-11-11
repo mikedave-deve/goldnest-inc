@@ -116,7 +116,7 @@ const AdminDashboard = () => {
     return (
       <div className="min-h-screen bg-[#111]">
         <AdminNavbar />
-        <div className="flex items-center justify-center h-screen">
+        <div className="flex items-center justify-center h-screen px-4">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4"></div>
             <p className="text-yellow-400">Loading dashboard...</p>
@@ -244,125 +244,174 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-[#111] text-white font-sans">
       <AdminNavbar />
 
-      <main className="px-4 md:px-10 lg:px-20 py-10">
+      <main className="px-4 md:px-10 lg:px-20 py-6 md:py-10">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-          <p className="text-gray-400">Welcome back! Here's what's happening with your platform.</p>
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Admin Dashboard</h1>
+          <p className="text-sm md:text-base text-gray-400">Welcome back! Here's what's happening with your platform.</p>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-10">
           {statCards.map((card, index) => {
             const Icon = card.icon;
             return (
               <div
                 key={index}
-                className={`${card.bgColor} border ${card.borderColor} rounded-lg p-6 transition hover:scale-105`}
+                className={`${card.bgColor} border ${card.borderColor} rounded-lg p-4 md:p-6 transition hover:scale-105`}
               >
-                <div className="flex items-center justify-between mb-3">
-                  <Icon className={`w-8 h-8 ${card.textColor}`} />
+                <div className="flex items-center justify-between mb-2 md:mb-3">
+                  <Icon className={`w-6 h-6 md:w-8 md:h-8 ${card.textColor}`} />
                 </div>
-                <p className="text-gray-400 text-sm mb-1">{card.title}</p>
-                <h2 className={`text-2xl font-bold ${card.textColor}`}>{card.value}</h2>
+                <p className="text-gray-400 text-xs md:text-sm mb-1">{card.title}</p>
+                <h2 className={`text-lg md:text-2xl font-bold ${card.textColor}`}>{card.value}</h2>
               </div>
             );
           })}
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-10">
           <button
             onClick={() => navigate("/admin/users?filter=pending")}
-            className="bg-yellow-500/10 border border-yellow-500 hover:bg-yellow-500/20 rounded-lg p-6 text-left transition"
+            className="bg-yellow-500/10 border border-yellow-500 hover:bg-yellow-500/20 rounded-lg p-4 md:p-6 text-left transition"
           >
-            <Clock className="w-8 h-8 text-yellow-400 mb-3" />
-            <h3 className="text-lg font-semibold text-yellow-400 mb-1">Pending Approvals</h3>
-            <p className="text-gray-400 text-sm">Review user registrations</p>
+            <Clock className="w-6 h-6 md:w-8 md:h-8 text-yellow-400 mb-2 md:mb-3" />
+            <h3 className="text-base md:text-lg font-semibold text-yellow-400 mb-1">Pending Approvals</h3>
+            <p className="text-xs md:text-sm text-gray-400">Review user registrations</p>
           </button>
 
           <button
             onClick={() => navigate("/admin/deposits?status=pending")}
-            className="bg-orange-500/10 border border-orange-500 hover:bg-orange-500/20 rounded-lg p-6 text-left transition"
+            className="bg-orange-500/10 border border-orange-500 hover:bg-orange-500/20 rounded-lg p-4 md:p-6 text-left transition"
           >
-            <DollarSign className="w-8 h-8 text-orange-400 mb-3" />
-            <h3 className="text-lg font-semibold text-orange-400 mb-1">Pending Deposits</h3>
-            <p className="text-gray-400 text-sm">Approve deposit requests</p>
+            <DollarSign className="w-6 h-6 md:w-8 md:h-8 text-orange-400 mb-2 md:mb-3" />
+            <h3 className="text-base md:text-lg font-semibold text-orange-400 mb-1">Pending Deposits</h3>
+            <p className="text-xs md:text-sm text-gray-400">Approve deposit requests</p>
           </button>
 
           <button
             onClick={() => navigate("/admin/withdrawals?status=pending")}
-            className="bg-pink-500/10 border border-pink-500 hover:bg-pink-500/20 rounded-lg p-6 text-left transition"
+            className="bg-pink-500/10 border border-pink-500 hover:bg-pink-500/20 rounded-lg p-4 md:p-6 text-left transition"
           >
-            <TrendingDown className="w-8 h-8 text-pink-400 mb-3" />
-            <h3 className="text-lg font-semibold text-pink-400 mb-1">Pending Withdrawals</h3>
-            <p className="text-gray-400 text-sm">Process withdrawal requests</p>
+            <TrendingDown className="w-6 h-6 md:w-8 md:h-8 text-pink-400 mb-2 md:mb-3" />
+            <h3 className="text-base md:text-lg font-semibold text-pink-400 mb-1">Pending Withdrawals</h3>
+            <p className="text-xs md:text-sm text-gray-400">Process withdrawal requests</p>
           </button>
 
           <button
             onClick={() => navigate("/admin/users")}
-            className="bg-blue-500/10 border border-blue-500 hover:bg-blue-500/20 rounded-lg p-6 text-left transition"
+            className="bg-blue-500/10 border border-blue-500 hover:bg-blue-500/20 rounded-lg p-4 md:p-6 text-left transition"
           >
-            <Users className="w-8 h-8 text-blue-400 mb-3" />
-            <h3 className="text-lg font-semibold text-blue-400 mb-1">Manage Users</h3>
-            <p className="text-gray-400 text-sm">View and edit users</p>
+            <Users className="w-6 h-6 md:w-8 md:h-8 text-blue-400 mb-2 md:mb-3" />
+            <h3 className="text-base md:text-lg font-semibold text-blue-400 mb-1">Manage Users</h3>
+            <p className="text-xs md:text-sm text-gray-400">View and edit users</p>
           </button>
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-black border border-[#222] rounded-lg p-6">
-          <h3 className="text-xl font-semibold mb-4 text-yellow-400">Recent Activity</h3>
+        <div className="bg-black border border-[#222] rounded-lg p-4 md:p-6">
+          <h3 className="text-lg md:text-xl font-semibold mb-4 text-yellow-400">Recent Activity</h3>
           
           {recentActivity.length === 0 ? (
             <p className="text-center text-gray-400 py-6">No recent activity</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-700 text-gray-400 text-sm">
-                    <th className="py-3 text-left">Type</th>
-                    <th className="py-3 text-left">User</th>
-                    <th className="py-3 text-left">Amount</th>
-                    <th className="py-3 text-left">Status</th>
-                    <th className="py-3 text-left">Date</th>
-                    <th className="py-3 text-left">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentActivity.map((activity, index) => (
-                    <tr key={activity._id || index} className="border-b border-gray-800 hover:bg-[#1a1a1a] transition">
-                      <td className="py-3">
-                        <span className="capitalize font-semibold text-white">{activity.type}</span>
-                      </td>
-                      <td className="py-3 text-gray-300">{activity.username}</td>
-                      <td className="py-3 text-gray-300">
-                        {activity.amount ? `$${activity.amount.toFixed(2)}` : "N/A"}
-                      </td>
-                      <td className="py-3">{getStatusBadge(activity.status)}</td>
-                      <td className="py-3 text-gray-400 text-sm">
-                        {new Date(activity.date).toLocaleString()}
-                      </td>
-                      <td className="py-3">
-                        <button
-                          onClick={() => {
-                            if (activity.type === "deposit") {
-                              navigate(`/admin/deposits`);
-                            } else if (activity.type === "withdrawal") {
-                              navigate(`/admin/withdrawals`);
-                            } else {
-                              navigate(`/admin/users`);
-                            }
-                          }}
-                          className="text-yellow-400 hover:text-yellow-300 text-sm font-semibold"
-                        >
-                          View →
-                        </button>
-                      </td>
+            <>
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-700 text-gray-400 text-sm">
+                      <th className="py-3 text-left">Type</th>
+                      <th className="py-3 text-left">User</th>
+                      <th className="py-3 text-left">Amount</th>
+                      <th className="py-3 text-left">Status</th>
+                      <th className="py-3 text-left">Date</th>
+                      <th className="py-3 text-left">Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {recentActivity.map((activity, index) => (
+                      <tr key={activity._id || index} className="border-b border-gray-800 hover:bg-[#1a1a1a] transition">
+                        <td className="py-3">
+                          <span className="capitalize font-semibold text-white">{activity.type}</span>
+                        </td>
+                        <td className="py-3 text-gray-300">{activity.username}</td>
+                        <td className="py-3 text-gray-300">
+                          {activity.amount ? `$${activity.amount.toFixed(2)}` : "N/A"}
+                        </td>
+                        <td className="py-3">{getStatusBadge(activity.status)}</td>
+                        <td className="py-3 text-gray-400 text-sm">
+                          {new Date(activity.date).toLocaleString()}
+                        </td>
+                        <td className="py-3">
+                          <button
+                            onClick={() => {
+                              if (activity.type === "deposit") {
+                                navigate(`/admin/deposits`);
+                              } else if (activity.type === "withdrawal") {
+                                navigate(`/admin/withdrawals`);
+                              } else {
+                                navigate(`/admin/users`);
+                              }
+                            }}
+                            className="text-yellow-400 hover:text-yellow-300 text-sm font-semibold"
+                          >
+                            View →
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="md:hidden space-y-3">
+                {recentActivity.map((activity, index) => (
+                  <div key={activity._id || index} className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <span className="capitalize font-semibold text-white text-sm">
+                          {activity.type}
+                        </span>
+                        <p className="text-gray-400 text-xs mt-1">{activity.username}</p>
+                      </div>
+                      {getStatusBadge(activity.status)}
+                    </div>
+                    
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-gray-500">Amount</span>
+                      <span className="text-sm font-semibold text-gray-300">
+                        {activity.amount ? `$${activity.amount.toFixed(2)}` : "N/A"}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs text-gray-500">Date</span>
+                      <span className="text-xs text-gray-400">
+                        {new Date(activity.date).toLocaleString()}
+                      </span>
+                    </div>
+                    
+                    <button
+                      onClick={() => {
+                        if (activity.type === "deposit") {
+                          navigate(`/admin/deposits`);
+                        } else if (activity.type === "withdrawal") {
+                          navigate(`/admin/withdrawals`);
+                        } else {
+                          navigate(`/admin/users`);
+                        }
+                      }}
+                      className="w-full bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 py-2 rounded text-sm font-semibold transition"
+                    >
+                      View Details →
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </main>
