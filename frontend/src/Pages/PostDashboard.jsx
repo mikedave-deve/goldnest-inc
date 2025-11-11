@@ -59,7 +59,7 @@ const PostDashboard = () => {
     }
 
     // ✅ FIXED: Use the actual referral code from backend
-    const referralUrl = `http://goldnest-inc.biz/register?ref=${userData.referralCode}`;
+    const referralUrl = `http://goldnest-inc.com/register?ref=${userData.referralCode}`;
 
     navigator.clipboard
       .writeText(referralUrl)
