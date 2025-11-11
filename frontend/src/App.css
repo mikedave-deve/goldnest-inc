@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* ========================================
+   CRITICAL: REMOVE ALL WHITE SPACE
+   ======================================== */
+
 /* Reset everything */
 * {
   margin: 0;
@@ -7,12 +11,13 @@
   box-sizing: border-box;
 }
 
-/* Critical: Black background everywhere */
+/* Force black background everywhere */
 html {
   height: 100%;
   overflow-x: hidden;
   background-color: #000000;
   overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -24,6 +29,8 @@ body {
   background-color: #000000;
   overscroll-behavior: none;
   position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
@@ -34,18 +41,31 @@ body {
   flex-direction: column;
 }
 
-/* iOS Safari fix */
+/* ========================================
+   iOS SAFARI FIXES
+   ======================================== */
+
 @supports (-webkit-touch-callout: none) {
   html {
     height: -webkit-fill-available;
   }
   
-  body, #root {
+  body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  
+  #root {
+    min-height: 100vh;
     min-height: -webkit-fill-available;
   }
 }
 
-/* Safety background - covers any white space */
+/* ========================================
+   CRITICAL: SAFETY BACKGROUND LAYER
+   This creates a massive black layer behind everything
+   ======================================== */
+
 body::after {
   content: '';
   position: fixed;
@@ -59,10 +79,60 @@ body::after {
   pointer-events: none;
 }
 
-/* Prevent bounce scroll showing white */
+/* ========================================
+   MOBILE SPECIFIC FIXES
+   ======================================== */
+
 @media (max-width: 768px) {
+  /* Prevent bounce scroll from showing white */
   html, body {
     overscroll-behavior-y: none;
     -webkit-overflow-scrolling: touch;
   }
+  
+  /* Extra padding on main content areas */
+  main {
+    padding-bottom: 10rem !important;
+  }
+  
+  /* Ensure pages extend beyond viewport */
+  [class*="min-h-screen"] {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* ========================================
+   PREVENT ANY DEFAULT SPACING
+   ======================================== */
+
+body > div,
+#root > div {
+  margin: 0;
+  padding: 0;
+}
+
+/* ========================================
+   SMOOTH SCROLLING
+   ======================================== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ========================================
+   UTILITY CLASSES FOR FULL SCREEN
+   ======================================== */
+
+.full-screen {
+  width: 100vw;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  margin: 0;
+  padding: 0;
+}
+
+.no-scroll-x {
+  overflow-x: hidden;
+  max-width: 100vw;
 }
