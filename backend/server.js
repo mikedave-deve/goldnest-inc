@@ -38,6 +38,21 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
+// Add this after the app.use(cors(...)) line
+app.use((req, res, next) => {
+  // Set CORS headers for all responses
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
+  next();
+});
 
 // Rate limiting - Global API limiter
 const limiter = rateLimit({
