@@ -33,11 +33,11 @@ const DepositConfirmation = () => {
 
   // Wallet addresses for different currencies
   const walletAddresses = {
-    bitcoin: "bc1q8j9k7l6m5n4p3q2r1s0t9u8v7w6x5y4z3a2b1c0",
-    usdt: "TYexampleTRC20AddressForUSDTDeposits123456",
-    ethereum: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
-    tron: "TXexampleTronAddressForTRXDeposits123456789",
-    paypal: "payments@goldnest-investment.com",
+    bitcoin: "bc1qhrquvx9ud6glyzsakyryec9ckf2lg935t3pqj7",
+    usdt: "TWvEnfuAgiJcGy3FjJXE6RMePC2E1ATE8a",
+    ethereum: "0x715C20F8128164E2eBDBb0685564793eC4355CE2",
+    tron: "TWvEnfuAgiJcGy3FjJXE6RMePC2E1ATE8a",
+    paypal: "askformailfromadmin",
   };
 
   const walletAddress =
