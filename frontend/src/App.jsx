@@ -15,7 +15,7 @@ import TransactionHistory from "./Pages/TransactionHistory.jsx";
 import Referral from "./Pages/Referral.jsx";
 import ProfileSettings from "./Pages/ProfileSettings.jsx";
 import DepositConfirmation from "./Pages/DepositConfirmation.jsx.jsx";
-import ResetPassword from '../Pages/ResetPassword.jsx';
+import ResetPassword from './Pages/ResetPassword.jsx';
 
 
 //Admin Dashboard Pages
