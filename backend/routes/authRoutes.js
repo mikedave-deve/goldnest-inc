@@ -25,7 +25,7 @@ router.post('/login', authController.login);
 
 /**
  * @route   POST /api/auth/forgot-password
- * @desc    Step 1: Request password reset - sends confirmation email with link
+ * @desc    Step 1: Request password reset - sends email with reset link
  * @access  Public
  * @body    { email }
  * @response { success, message }
@@ -33,13 +33,13 @@ router.post('/login', authController.login);
 router.post('/forgot-password', authController.forgotPassword);
 
 /**
- * @route   POST /api/auth/confirm-password-reset
- * @desc    Step 2: Confirm password reset - generates new password
+ * @route   POST /api/auth/reset-password/:token
+ * @desc    Step 2: Complete password reset - generates new password automatically
  * @access  Public
- * @body    { token }
+ * @params  { token }
  * @response { success, message }
  */
-router.post('/confirm-password-reset', authController.confirmPasswordReset);
+router.post('/reset-password/:token', authController.resetPassword);
 
 // ============================================================
 // PRIVATE ROUTES - Authentication required

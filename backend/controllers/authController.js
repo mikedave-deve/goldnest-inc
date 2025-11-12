@@ -1,6 +1,6 @@
 const User = require('../models/User');
 const Referral = require('../models/Referral');
-const Settings = require('../models/Settings'); // ⭐ ADDED - Settings Model
+const Settings = require('../models/Settings');
 const jwt = require('jsonwebtoken');
 const emailService = require('../services/emailService');
 const crypto = require('crypto');
@@ -9,8 +9,8 @@ const crypto = require('crypto');
 // HELPER FUNCTIONS
 // ============================================================
 
-const generateRandomPassword = (length = 8) => {
-  const charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
+const generateRandomPassword = (length = 12) => {
+  const charset = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%';
   let password = '';
   for (let i = 0; i < length; i++) {
     password += charset.charAt(Math.floor(Math.random() * charset.length));
@@ -34,7 +34,7 @@ exports.register = async (req, res) => {
   try {
     const { username, email, password, confirmPassword, referralCode, fullName, phone } = req.body;
 
-    // ⭐ ADDED - Check if registration is allowed
+    // Check if registration is allowed
     const settings = await Settings.findOne();
     if (settings && !settings.allowRegistration) {
       return res.status(403).json({
@@ -79,17 +79,15 @@ exports.register = async (req, res) => {
       }
     }
 
-    // CRITICAL: Create user with 'pending' status (awaiting admin approval)
+    // Create user with 'pending' status
     const user = await User.create({
       username,
       email: email.toLowerCase(),
       password,
       fullName,
       phone,
-      status: 'pending', // MUST BE APPROVED BY ADMIN
+      status: 'pending',
       role: 'user',
-      
-      // Initialize all balances to 0
       accountBalance: 0,
       earnedTotal: 0,
       totalDeposits: 0,
@@ -103,9 +101,8 @@ exports.register = async (req, res) => {
 
     console.log('✅ User registered (pending approval):', user.username, user.email);
 
-    // Handle referral code (will be processed when user is approved)
+    // Handle referral code
     if (referralCode) {
-      // Store referral code temporarily (will create Referral record on approval)
       user.tempReferralCode = referralCode;
       await user.save({ validateBeforeSave: false });
       console.log('✓ Referral code stored:', referralCode);
@@ -114,19 +111,16 @@ exports.register = async (req, res) => {
     // Send emails asynchronously
     if (emailService) {
       Promise.all([
-        // 1. Send "pending approval" email to user
         emailService.sendRegistrationPending && emailService.sendRegistrationPending(user.email, user.username)
           .then(() => console.log('✅ Pending approval email sent to:', user.email))
           .catch(err => console.error('❌ Failed to send pending email:', err.message)),
         
-        // 2. Notify admin of new registration
         emailService.sendAdminNewUserNotification && emailService.sendAdminNewUserNotification(user.username, user.email)
           .then(() => console.log('✅ Admin notification sent'))
           .catch(err => console.error('❌ Failed to send admin notification:', err.message))
       ]).catch(err => console.error('Email sending error:', err));
     }
 
-    // NO TOKEN GENERATED - User cannot login until approved
     res.status(201).json({
       success: true,
       message: 'Registration successful! Your account is pending admin approval. You will receive an email once approved.',
@@ -135,9 +129,8 @@ exports.register = async (req, res) => {
         username: user.username,
         email: user.email,
         fullName: user.fullName,
-        status: user.status, // Will show 'pending'
+        status: user.status,
       },
-      // No token returned - user must wait for approval
     });
   } catch (error) {
     console.error('❌ Registration error:', error);
@@ -197,7 +190,7 @@ exports.login = async (req, res) => {
 
     console.log('✓ User found:', user.username, '- Status:', user.status);
 
-    // CRITICAL: Check account status BEFORE password verification
+    // Check account status BEFORE password verification
     if (user.status === 'pending') {
       return res.status(403).json({
         success: false,
@@ -222,7 +215,6 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Only approved users reach this point
     if (user.status !== 'approved') {
       return res.status(403).json({
         success: false,
@@ -264,7 +256,6 @@ exports.login = async (req, res) => {
 
     console.log('✅ User logged in:', user.username);
 
-    // Return user data and token
     res.status(200).json({
       success: true,
       token,
@@ -328,7 +319,7 @@ exports.getCurrentUser = async (req, res) => {
 
 // ============================================================
 // @route   PUT /api/auth/change-password
-// @desc    Change user password
+// @desc    Change user password (FROM PROFILE SETTINGS)
 // @access  Private
 // ============================================================
 
@@ -354,6 +345,13 @@ exports.changePassword = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Password must be at least 6 characters',
+      });
+    }
+
+    if (currentPassword === newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'New password must be different from current password',
       });
     }
 
@@ -386,7 +384,8 @@ exports.changePassword = async (req, res) => {
 
     // Send security alert email
     if (emailService && emailService.sendPasswordChanged) {
-      emailService.sendPasswordChanged(user.email, user.username, req.ip)
+      const userIP = req.ip || req.connection.remoteAddress || 'unknown';
+      emailService.sendPasswordChanged(user.email, user.username, userIP)
         .then(() => console.log('✅ Password change email sent'))
         .catch(err => console.error('❌ Failed to send password change email:', err.message));
     }
@@ -407,7 +406,7 @@ exports.changePassword = async (req, res) => {
 
 // ============================================================
 // @route   POST /api/auth/forgot-password
-// @desc    Step 1: Send password reset confirmation email
+// @desc    Step 1: Request password reset - send email with link
 // @access  Public
 // ============================================================
 
@@ -433,7 +432,7 @@ exports.forgotPassword = async (req, res) => {
 
     // Generate reset token (valid for 1 hour)
     const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetTokenExpiry = Date.now() + 3600000;
+    const resetTokenExpiry = Date.now() + 3600000; // 1 hour
 
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpiry = resetTokenExpiry;
@@ -441,13 +440,14 @@ exports.forgotPassword = async (req, res) => {
 
     console.log('✅ Password reset token generated for:', user.username);
 
-    // Send reset confirmation email
-    if (emailService && emailService.sendPasswordResetConfirmation) {
+    // Send reset request email with link
+    if (emailService && emailService.sendPasswordResetRequest) {
       try {
-        await emailService.sendPasswordResetConfirmation(user.email, user.username, resetToken);
-        console.log('✅ Password reset confirmation email sent to:', user.email);
+        await emailService.sendPasswordResetRequest(user.email, user.username, resetToken);
+        console.log('✅ Password reset email sent to:', user.email);
       } catch (emailError) {
         console.error('❌ Failed to send password reset email:', emailError.message);
+        // Continue even if email fails
       }
     }
 
@@ -466,14 +466,14 @@ exports.forgotPassword = async (req, res) => {
 };
 
 // ============================================================
-// @route   POST /api/auth/confirm-password-reset
+// @route   POST /api/auth/reset-password/:token
 // @desc    Step 2: Confirm reset and generate new password
 // @access  Public
 // ============================================================
 
-exports.confirmPasswordReset = async (req, res) => {
+exports.resetPassword = async (req, res) => {
   try {
-    const { token } = req.body;
+    const { token } = req.params;
 
     if (!token) {
       return res.status(400).json({
@@ -482,6 +482,7 @@ exports.confirmPasswordReset = async (req, res) => {
       });
     }
 
+    // Find user with valid token
     const user = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpiry: { $gt: Date.now() }
@@ -494,10 +495,8 @@ exports.confirmPasswordReset = async (req, res) => {
       });
     }
 
-    // Generate new random password
-    const newPassword = generateRandomPassword(8);
-
-    const userIP = req.ip || req.connection.remoteAddress || 'unknown';
+    // Generate new secure password
+    const newPassword = generateRandomPassword(12);
 
     // Update user password
     user.password = newPassword;
@@ -506,24 +505,25 @@ exports.confirmPasswordReset = async (req, res) => {
     user.lastPasswordChange = Date.now();
     await user.save();
 
-    console.log('✅ Password reset confirmed for user:', user.username);
+    console.log('✅ Password reset completed for user:', user.username);
 
     // Send new password email
-    if (emailService && emailService.sendPasswordResetComplete) {
+    if (emailService && emailService.sendNewPasswordEmail) {
       try {
-        await emailService.sendPasswordResetComplete(user.email, user.username, newPassword, userIP);
+        await emailService.sendNewPasswordEmail(user.email, user.username, newPassword);
         console.log('✅ New password email sent to:', user.email);
       } catch (emailError) {
         console.error('❌ Failed to send new password email:', emailError.message);
+        // Still return success to user
       }
     }
 
     res.status(200).json({
       success: true,
-      message: 'Password reset successful! New password has been sent to your email.',
+      message: 'Password reset successful! Check your email for your new password.',
     });
   } catch (error) {
-    console.error('Confirm password reset error:', error);
+    console.error('Reset password error:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to reset password',
