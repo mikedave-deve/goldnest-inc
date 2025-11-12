@@ -1,6 +1,6 @@
 // ============================================================
 // GOLDNEST INVESTMENT PLATFORM BACKEND
-// Server with Integrated Express App
+// Server with Integrated Express App - VERCEL OPTIMIZED
 // ============================================================
 
 require('dotenv').config();
@@ -21,6 +21,10 @@ const routeGroupEndpoints = {};
 // ============================================================
 // SECURITY & GLOBAL MIDDLEWARE
 // ============================================================
+
+// CRITICAL FIX #1: Trust proxy for Vercel/production environments
+// This fixes the "X-Forwarded-For" rate limiting error
+app.set('trust proxy', 1);
 
 // Secure HTTP headers
 app.use(helmet());
@@ -78,45 +82,90 @@ app.use((req, res, next) => {
 });
 
 // ============================================================
-// DATABASE CONNECTION
+// DATABASE CONNECTION - VERCEL SERVERLESS OPTIMIZED
 // ============================================================
 
+// CRITICAL FIX #2: Connection caching for serverless
+let cachedConnection = null;
+
 const connectDB = async () => {
+  // Return cached connection if it exists and is ready
+  if (cachedConnection && mongoose.connection.readyState === 1) {
+    console.log('✅ Using cached MongoDB connection');
+    return cachedConnection;
+  }
+
   const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/goldnest-investment-platform';
 
   try {
-    await mongoose.connect(mongoUri, {
+    // CRITICAL FIX #3: Optimized connection settings for Vercel serverless
+    const connection = await mongoose.connect(mongoUri, {
       maxPoolSize: 10,
       minPoolSize: 2,
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 30000,  // Increased from 5000
       socketTimeoutMS: 45000,
+      connectTimeoutMS: 30000,          // Added explicit connect timeout
       retryWrites: true,
-      w: 'majority'
+      w: 'majority',
+      // Serverless optimization
+      maxIdleTimeMS: 10000,
+      heartbeatFrequencyMS: 10000
     });
 
+    cachedConnection = connection;
     const dbName = mongoose.connection.db?.databaseName || 'goldnest-investment-platform';
     console.log(`✅ MongoDB connected successfully to: ${dbName}`);
     console.log(`   Host: ${mongoose.connection.host}`);
     console.log(`   Port: ${mongoose.connection.port}`);
 
-    return true;
+    return connection;
   } catch (error) {
     console.error(`❌ MongoDB connection failed: ${error.message}`);
-    return false;
+    cachedConnection = null;
+    throw error; // Re-throw to handle in serverless context
   }
 };
 
 // Connection event listeners
 mongoose.connection.on('disconnected', () => {
   console.warn('⚠️  MongoDB disconnected');
+  cachedConnection = null;
 });
 
 mongoose.connection.on('error', (err) => {
   console.error('❌ MongoDB error:', err.message);
+  cachedConnection = null;
 });
 
 mongoose.connection.on('reconnected', () => {
   console.log('✅ MongoDB reconnected');
+});
+
+// ============================================================
+// MIDDLEWARE: Ensure DB connection before handling requests
+// ============================================================
+
+app.use(async (req, res, next) => {
+  try {
+    // Skip DB check for health endpoint
+    if (req.path === '/api/health') {
+      return next();
+    }
+
+    // Ensure database is connected
+    if (mongoose.connection.readyState !== 1) {
+      console.log('⚠️  Database not connected, attempting to connect...');
+      await connectDB();
+    }
+    next();
+  } catch (error) {
+    console.error('❌ Database connection error:', error.message);
+    return res.status(503).json({
+      success: false,
+      message: 'Database connection error. Please try again.',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
 });
 
 // ============================================================
@@ -188,9 +237,9 @@ try {
 try {
  const supportRoutes = require('./routes/supportRoutes');
  app.use('/api/support', supportRoutes);
-  console.log('✅ Referral routes loaded');
+  console.log('✅ Support routes loaded');
 } catch (err) {
-  console.error('❌ Error loading referral routes:', err.message);
+  console.error('❌ Error loading support routes:', err.message);
 }
 
 console.log('====================================\n');
@@ -216,7 +265,7 @@ const countApiEndpoints = (stack) => {
 };
 
 // Count only routes mounted under '/api' (skip global middleware before any /api path)
-const apiRouter = app._router.stack.find(layer => layer.regexp.test('/api')).handle;
+const apiRouter = app._router.stack.find(layer => layer.regexp.test('/api'))?.handle;
 if (apiRouter && apiRouter.stack) {
   totalEndpointsCount = countApiEndpoints(apiRouter.stack);
 }
@@ -369,7 +418,7 @@ app.use((err, req, res, next) => {
 // ============================================================
 
 const PORT = parseInt(process.env.PORT || '5000', 10);
-const HOST = process.env.HOST || 'localhost';
+const HOST = process.env.HOST || '0.0.0.0'; // Changed from localhost for Vercel
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 const startServer = async () => {
@@ -378,23 +427,24 @@ const startServer = async () => {
     console.log('🚀 GOLDNEST INVESTMENT PLATFORM - STARTING SERVER...');
     console.log('='.repeat(70) + '\n');
 
-    // Connect to database
+    // Connect to database (with caching for serverless)
     const dbConnected = await connectDB();
     if (!dbConnected) {
       // Allow server to start even if DB connection fails, 
       // but log a severe warning (useful for local development without MongoDB)
-      console.warn('⚠️  Server is starting without a database connection.');
+      console.warn('⚠️  Server is starting without a database connection.');
     }
 
-    // Start HTTP server
-    const server = app.listen(PORT, HOST, () => {
-      const baseUrl = `http://${HOST}:${PORT}`;
-      const totalEndpointsString = totalEndpointsCount.toString();
-      const endpointsSection = totalEndpointsCount === 0 
-        ? '⚠️ No API endpoints detected (excluding health checks) '
-        : `➜ Total: ${totalEndpointsString} API Endpoints${' '.repeat(70 - 24 - totalEndpointsString.length)}`;
+    // Start HTTP server (only in non-serverless environments)
+    if (process.env.VERCEL !== '1') {
+      const server = app.listen(PORT, HOST, () => {
+        const baseUrl = `http://${HOST}:${PORT}`;
+        const totalEndpointsString = totalEndpointsCount.toString();
+        const endpointsSection = totalEndpointsCount === 0 
+          ? '⚠️ No API endpoints detected (excluding health checks) '
+          : `➜ Total: ${totalEndpointsString} API Endpoints${' '.repeat(70 - 24 - totalEndpointsString.length)}`;
 
-      console.log(`
+        console.log(`
 ╔════════════════════════════════════════════════════════════╗
 ║                                                            ║
 ║   ✅ GoldNest Investment Platform Backend                 ║
@@ -426,6 +476,7 @@ const startServer = async () => {
 ║   • CORS: Enabled                                          ║
 ║   • Rate Limiting: Enabled                                 ║
 ║   • MongoDB Sanitization: Enabled                          ║
+║   • Trust Proxy: Enabled (Vercel Ready)                    ║
 ║                                                            ║
 ║   📧 Services:                                             ║
 ║   • Email: ${(process.env.SMTP_USER ? '✅ Active' : '❌ Disabled').padEnd(64)}║
@@ -435,52 +486,55 @@ const startServer = async () => {
 
       Ready for requests! Press Ctrl+C to stop.
       `);
-    });
-
-    // ============================================================
-    // GRACEFUL SHUTDOWN (Mongoose v8+ compatible)
-    // ============================================================
-
-    const gracefulShutdown = async (signal) => {
-      console.log(`\n📴 ${signal} received, shutting down gracefully...`);
-
-      // Close HTTP server
-      server.close(async () => {
-        console.log('✅ HTTP server closed');
-
-        try {
-          // Close MongoDB connection
-          await mongoose.connection.close(false);
-          console.log('✅ MongoDB connection closed');
-        } catch (err) {
-          console.error('⚠️  Error closing MongoDB:', err.message);
-        } finally {
-          console.log('✅ Server shutdown complete');
-          process.exit(0);
-        }
       });
 
-      // Force shutdown after 10 seconds
-      setTimeout(() => {
-        console.error('❌ Forced shutdown - connections still active');
-        process.exit(1);
-      }, 10000);
-    };
+      // ============================================================
+      // GRACEFUL SHUTDOWN (Mongoose v8+ compatible)
+      // ============================================================
 
-    // Listen for shutdown signals
-    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+      const gracefulShutdown = async (signal) => {
+        console.log(`\n📴 ${signal} received, shutting down gracefully...`);
 
-    // Handle unhandled promise rejections
-    process.on('unhandledRejection', (reason, promise) => {
-      console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
-    });
+        // Close HTTP server
+        server.close(async () => {
+          console.log('✅ HTTP server closed');
 
-    // Handle uncaught exceptions
-    process.on('uncaughtException', (error) => {
-      console.error('❌ Uncaught Exception:', error);
-      gracefulShutdown('UNCAUGHT_EXCEPTION');
-    });
+          try {
+            // Close MongoDB connection
+            await mongoose.connection.close(false);
+            console.log('✅ MongoDB connection closed');
+          } catch (err) {
+            console.error('⚠️  Error closing MongoDB:', err.message);
+          } finally {
+            console.log('✅ Server shutdown complete');
+            process.exit(0);
+          }
+        });
+
+        // Force shutdown after 10 seconds
+        setTimeout(() => {
+          console.error('❌ Forced shutdown - connections still active');
+          process.exit(1);
+        }, 10000);
+      };
+
+      // Listen for shutdown signals
+      process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+      process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+      // Handle unhandled promise rejections
+      process.on('unhandledRejection', (reason, promise) => {
+        console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+      });
+
+      // Handle uncaught exceptions
+      process.on('uncaughtException', (error) => {
+        console.error('❌ Uncaught Exception:', error);
+        gracefulShutdown('UNCAUGHT_EXCEPTION');
+      });
+    } else {
+      console.log('✅ Running in Vercel serverless mode');
+    }
 
   } catch (error) {
     console.error('❌ Failed to start server:', error.message);
@@ -490,9 +544,11 @@ const startServer = async () => {
 };
 
 // ============================================================
-// START SERVER
+// START SERVER (only if not in Vercel serverless)
 // ============================================================
 
-startServer();
+if (process.env.VERCEL !== '1') {
+  startServer();
+}
 
 module.exports = app;
