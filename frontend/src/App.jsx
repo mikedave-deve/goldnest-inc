@@ -15,7 +15,8 @@ import TransactionHistory from "./Pages/TransactionHistory.jsx";
 import Referral from "./Pages/Referral.jsx";
 import ProfileSettings from "./Pages/ProfileSettings.jsx";
 import DepositConfirmation from "./Pages/DepositConfirmation.jsx.jsx";
-import ResetPasswordConfirm from "./Pages/ResetPasswordConfirm.jsx";
+import ResetPassword from '../Pages/ResetPassword.jsx';
+
 
 //Admin Dashboard Pages
 import AdminDashboard from "./Pages/admin/AdminDashboard.jsx";
@@ -40,14 +41,11 @@ function App() {
         <Route path="/Login" element={<Login />} />
         <Route path="/Register" element={<Register />} />
         <Route path="/ForgetPassword" element={<ForgetPassword />} />
-        <Route
-          path="/ResetPasswordConfirm"
-          element={<ResetPasswordConfirm />}
-        />
         <Route path="/About" element={<About />} />
         <Route path="/Investment" element={<Investment />} />
         <Route path="/Partners" element={<Partners />} />
         <Route path="/ContactUs" element={<ContactUs />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
 
         {/* ================================================
             USER DASHBOARD ROUTES - Requires authentication
@@ -116,6 +114,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        
 
         {/* ================================================
             ADMIN DASHBOARD ROUTES - Requires admin role

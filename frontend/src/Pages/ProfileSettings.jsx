@@ -25,6 +25,8 @@ const ProfileSettings = () => {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Password visibility states
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -77,7 +79,7 @@ const ProfileSettings = () => {
         localStorage.removeItem("userInfo");
         navigate("/login");
       } else {
-        alert(`Error loading profile: ${errorMsg}`);
+        setErrorMessage(`Error loading profile: ${errorMsg}`);
       }
     } finally {
       setLoading(false);
@@ -87,6 +89,9 @@ const ProfileSettings = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear messages when user types
+    setSuccessMessage("");
+    setErrorMessage("");
   };
 
   const handleWalletChange = (e) => {
@@ -96,42 +101,46 @@ const ProfileSettings = () => {
 
   const handleSaveChanges = async () => {
     try {
+      setSuccessMessage("");
+      setErrorMessage("");
+
+      // Validate password fields
       if (
         formData.newPassword ||
         formData.retypePassword ||
         formData.currentPassword
       ) {
         if (!formData.currentPassword) {
-          alert("Please enter your current password");
+          setErrorMessage("Please enter your current password");
           return;
         }
 
         if (!formData.newPassword) {
-          alert("Please enter a new password");
+          setErrorMessage("Please enter a new password");
           return;
         }
 
         if (!formData.retypePassword) {
-          alert("Please retype your new password");
+          setErrorMessage("Please retype your new password");
           return;
         }
 
         if (formData.newPassword !== formData.retypePassword) {
-          alert("New passwords do not match!");
+          setErrorMessage("New passwords do not match!");
           return;
         }
 
         if (formData.newPassword.length < 6) {
-          alert("New password must be at least 6 characters long");
+          setErrorMessage("New password must be at least 6 characters long");
           return;
         }
 
         if (formData.currentPassword === formData.newPassword) {
-          alert("New password must be different from current password");
+          setErrorMessage("New password must be different from current password");
           return;
         }
       } else {
-        alert(
+        setErrorMessage(
           "Please fill in password fields if you want to change your password"
         );
         return;
@@ -148,25 +157,29 @@ const ProfileSettings = () => {
       const response = await authAPI.changePassword(passwordData);
 
       if (response.data.success) {
-        alert(
-          "Password updated successfully! Please login again with your new password."
+        setSuccessMessage(
+          "Password changed successfully! A security alert email has been sent to your inbox."
         );
 
+        // Clear password fields
         setFormData((prev) => ({
           ...prev,
           currentPassword: "",
           newPassword: "",
           retypePassword: "",
         }));
+
+        // Scroll to top to show success message
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
     } catch (error) {
       console.error("Password update error:", error);
       const errorMsg = getErrorMessage(error);
 
       if (error.response?.status === 401) {
-        alert("Current password is incorrect");
+        setErrorMessage("Current password is incorrect");
       } else {
-        alert(`Failed to update password: ${errorMsg}`);
+        setErrorMessage(`Failed to update password: ${errorMsg}`);
       }
     } finally {
       setSaving(false);
@@ -218,6 +231,25 @@ const ProfileSettings = () => {
 
       {/* Mobile-Optimized Main Content */}
       <main className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 lg:py-10 pb-20">
+        {/* Success/Error Messages */}
+        {successMessage && (
+          <div className="bg-green-900/30 text-green-400 border border-green-500 rounded-lg p-4 mb-6">
+            <p className="flex items-start gap-2">
+              <span className="text-xl">✓</span>
+              <span>{successMessage}</span>
+            </p>
+          </div>
+        )}
+
+        {errorMessage && (
+          <div className="bg-red-900/30 text-red-400 border border-red-500 rounded-lg p-4 mb-6">
+            <p className="flex items-start gap-2">
+              <span className="text-xl">⚠</span>
+              <span>{errorMessage}</span>
+            </p>
+          </div>
+        )}
+
         {/* Profile Header Card - Mobile Optimized */}
         <div className="bg-gradient-to-br from-[#0b0b0b] to-black border border-yellow-600 rounded-xl shadow-2xl p-4 sm:p-6 mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
@@ -335,7 +367,7 @@ const ProfileSettings = () => {
                       value={formData.newPassword}
                       onChange={handleChange}
                       className="w-full bg-black border border-gray-600 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 pr-10 sm:pr-12 text-gray-100 text-sm sm:text-base focus:outline-none focus:border-[#f5c84c] focus:ring-1 focus:ring-[#f5c84c] transition"
-                      placeholder="Enter new password"
+                      placeholder="Enter new password (min 6 characters)"
                     />
                     <button
                       type="button"
@@ -381,6 +413,13 @@ const ProfileSettings = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Password Requirements Info */}
+              <div className="mt-4 p-3 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
+                <p className="text-xs text-gray-400">
+                  <span className="text-yellow-500">ℹ️</span> Password must be at least 6 characters and different from your current password
+                </p>
+              </div>
             </div>
 
             {/* Save Button */}
@@ -392,7 +431,7 @@ const ProfileSettings = () => {
                   saving ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                {saving ? "Saving..." : "Save Changes"}
+                {saving ? "Saving..." : "Change Password"}
               </button>
             </div>
           </section>

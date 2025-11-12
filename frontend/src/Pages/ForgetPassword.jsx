@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { authAPI, getErrorMessage } from "../api";
 
@@ -17,26 +17,23 @@ function ForgotPassword() {
     setIsLoading(true);
 
     try {
-      // Call backend to request password reset
-      // Backend should send first email: "Password request confirmation" with link
       const response = await authAPI.forgotPassword({ email });
 
       if (response.data.success) {
         setMessage(
-          response.data.message || 
-          "Password reset link sent to your email! Please check your inbox."
+          "Password reset link sent to your email! Please check your inbox and click the link to generate a new password."
         );
         setMessageType("success");
-        
+
         // Clear email field
         setEmail("");
-        
-        // Redirect to login after 5 seconds
-        setTimeout(() => navigate("/login"), 5000);
+
+        // Redirect to login after 8 seconds
+        setTimeout(() => navigate("/login"), 8000);
       }
     } catch (err) {
       console.error("Password Recovery Error:", err);
-      
+
       const errorMsg = getErrorMessage(err);
       setMessage(errorMsg);
       setMessageType("error");
@@ -50,7 +47,13 @@ function ForgotPassword() {
       <div className="-mt-70 bg-black text-white rounded-sm shadow-2xl p-5 lg:w-[550px] w-450 max-w-full">
         {/* Logo */}
         <div className="flex justify-center mb-4">
-          <img src={logo} alt="Goldnest Logo" className="w-40 object-contain" />
+          <Link to="/Home">
+            <img
+              src={logo}
+              alt="Goldnest Logo"
+              className="w-40 object-contain"
+            />
+          </Link>
         </div>
 
         {/* Title with gold lines */}
@@ -63,13 +66,17 @@ function ForgotPassword() {
         </div>
 
         <p className="text-gray-300 text-sm text-center mb-6">
-          Enter your email address and we'll send you a link to reset your password.
+          Enter your email address and we'll send you a link to reset your
+          password. Click the link in your email to automatically generate a new
+          secure password.
         </p>
 
         {/* Form */}
         <form onSubmit={handleRecover}>
           <div className="mb-6">
-            <label className="block text-sm mb-2 text-[#fdc700]">Email Address</label>
+            <label className="block text-sm mb-2 text-[#fdc700]">
+              Email Address
+            </label>
             <input
               type="email"
               value={email}
@@ -77,6 +84,7 @@ function ForgotPassword() {
               placeholder="Enter your email"
               className="w-full p-3 bg-white text-black rounded focus:outline-none"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -89,7 +97,7 @@ function ForgotPassword() {
                 : "bg-[#D4AF37] hover:bg-[#c6a030]"
             } text-black font-semibold py-3 rounded transition`}
           >
-            {isLoading ? "SENDING..." : "RECOVER"}
+            {isLoading ? "SENDING..." : "SEND RESET LINK"}
           </button>
         </form>
 
@@ -102,6 +110,23 @@ function ForgotPassword() {
             }`}
           >
             {message}
+          </div>
+        )}
+
+        {/* Instructions */}
+        {messageType === "success" && (
+          <div className="mt-4 p-3 bg-yellow-900/20 border border-yellow-600/30 rounded">
+            <p className="text-yellow-400 text-xs text-center">
+              <strong>Next steps:</strong>
+              <br />
+              1. Check your email inbox
+              <br />
+              2. Click the password reset link
+              <br />
+              3. Your new password will be emailed to you
+              <br />
+              4. Login with your new password
+            </p>
           </div>
         )}
 

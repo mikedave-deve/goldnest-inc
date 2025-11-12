@@ -44,7 +44,7 @@ export const authAPI = {
   register: (data) => api.post("/auth/register", data),
   login: (data) => api.post("/auth/login", data),
   forgotPassword: (data) => api.post("/auth/forgot-password", data),
-  confirmPasswordReset: (data) => api.post("/auth/confirm-password-reset", data),
+  resetPassword: (token) => api.post(`/auth/reset-password/${token}`),
   logout: () => api.post("/auth/logout"),
   getMe: () => api.get("/auth/me"),
   changePassword: (data) => api.put("/auth/change-password", data),
@@ -119,12 +119,11 @@ export const adminAPI = {
   updateTransaction: (id, data) => api.put(`/admin/transactions/${id}`, data),
   deleteTransaction: (id) => api.delete(`/admin/transactions/${id}`),
 
- // ===== Settings Management =====
+  // ===== Settings Management =====
   getSettings: () => api.get("/admin/settings"),
   updateSettings: (settings) => api.put("/admin/settings", settings),
 
   // ===== Referral Management - COMPLETE =====
-  // Generic methods for direct API access
   get: (endpoint, config) => api.get(endpoint, config),
   put: (endpoint, data) => api.put(endpoint, data),
   post: (endpoint, data) => api.post(endpoint, data),

@@ -4,15 +4,13 @@ import logo from "../assets/logo.png";
 import { Eye, EyeOff } from "lucide-react";
 import { authAPI, getErrorMessage } from "../api";
 
-
-
 function Register() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-     fullName: "",
-    phone: "", 
+    fullName: "",
+    phone: "",
     password: "",
     confirmPassword: "",
   });
@@ -41,12 +39,19 @@ function Register() {
         return;
       }
 
-          // Basic client-side validation for required fields
-    if (!formData.username || !formData.email || !formData.fullName || !formData.phone || !formData.password || !formData.confirmPassword) {
-      setError('Please fill in all required fields.');
-      setLoading(false);
-      return;
-    }
+      // Basic client-side validation for required fields
+      if (
+        !formData.username ||
+        !formData.email ||
+        !formData.fullName ||
+        !formData.phone ||
+        !formData.password ||
+        !formData.confirmPassword
+      ) {
+        setError("Please fill in all required fields.");
+        setLoading(false);
+        return;
+      }
 
       if (formData.password.length < 6) {
         setMessage("Password must be at least 6 characters");
@@ -62,7 +67,6 @@ function Register() {
         setIsLoading(false);
         return;
       }
-
 
       // Prepare registration payload
       const registerPayload = {
@@ -80,11 +84,11 @@ function Register() {
       // Handle successful registration
       if (response.data.success) {
         setMessage(
-          response.data.message || 
-          "Registration successful! Your account is pending admin approval. You'll receive an email once approved."
+          response.data.message ||
+            "Registration successful! Your account is pending admin approval. You'll receive an email once approved."
         );
         setMessageType("success");
-        
+
         // Redirect to login after 4 seconds
         setTimeout(() => {
           navigate("/login");
@@ -92,7 +96,7 @@ function Register() {
       }
     } catch (err) {
       console.error("Registration Error:", err);
-      
+
       // Extract and display error message
       const errorMsg = getErrorMessage(err);
       setMessage(errorMsg);
@@ -106,7 +110,13 @@ function Register() {
     <div className="flex items-center justify-center min-h-screen bg-[#181818] px-4 lg:pt-65">
       <div className="lg:-mt-60 mb-25 bg-black text-white rounded-xl shadow-2xl p-5 lg:w-[550px] w-450 max-w-full">
         <div className="flex justify-center mb-4">
-          <img src={logo} alt="Goldnest Logo" className="w-40 object-contain" />
+          <Link to="/Home">
+            <img
+              src={logo}
+              alt="Goldnest Logo"
+              className="w-40 object-contain"
+            />
+          </Link>
         </div>
 
         <div className="flex items-center justify-center mb-8">
@@ -140,8 +150,8 @@ function Register() {
             className="w-full p-3 bg-white text-black rounded mb-3"
             required
           />
-          
-            <input
+
+          <input
             type="text"
             name="fullName"
             placeholder="Full Name"
@@ -151,14 +161,14 @@ function Register() {
             required
           />
 
-            <input
+          <input
             type="tel"
             name="phone"
             placeholder="Phone Number (e.g., +15551234567)"
             value={formData.phone}
             onChange={handleChange}
             className="w-full p-3 bg-white text-black rounded mb-3"
-            pattern="^\+?[\d\s\-\(\)]{7,30}$" 
+            pattern="^\+?[\d\s\-\(\)]{7,30}$"
             title="Enter a valid phone number, including country code (optional '+') and digits. Spaces and hyphens are allowed."
             required
           />
@@ -214,7 +224,6 @@ function Register() {
               )}
             </button>
           </div>
-
 
           <button
             type="submit"

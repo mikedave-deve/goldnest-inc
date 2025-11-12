@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import logo from "../assets/logo.png";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { authAPI, storeAuth, getErrorMessage } from "../api";
 
@@ -83,7 +83,9 @@ function Login() {
     <div className="flex items-center justify-center min-h-screen bg-[#181818] px-4 lg:pt-40">
       <div className="bg-black text-white rounded-sm -mt-70 shadow-2xl p-5 lg:w-[550px] w-full max-w-md">
         <div className="flex justify-center mb-4">
+          <Link to="/Home">
           <img src={logo} alt="Goldnest Logo" className="w-40 object-contain" />
+          </Link>
         </div>
 
         <div className="flex justify-center mb-4">
